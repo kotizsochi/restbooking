@@ -10,6 +10,8 @@ import {
   TrendingUp, UserCheck, UserX, Filter, Trash2, Move, LayoutGrid,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTRPC } from "@/lib/trpc";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 type Tab = "venues" | "tariffs" | "staff" | "stats" | "settings";
 
@@ -402,6 +404,17 @@ interface EditorTable { id: string; label: string; x: number; y: number; type: s
 
 function SettingsTab() {
   const [section, setSection] = useState<"floor" | "widget" | "notifications">("floor");
+  const trpc = useTRPC();
+
+  // Загружаем столы из API
+  const layoutQuery = useQuery(trpc.floor.getLayout.queryOptions({ hallId: undefined }));
+  const saveLayoutMut = useMutation(
+    trpc.floor.saveLayout.mutationOptions({
+      onSuccess: () => setSaveStatus("saved"),
+      onError: () => setSaveStatus("error"),
+    })
+  );
+
   const [tables, setTables] = useState<EditorTable[]>([
     { id: "t1", label: "1", x: 80, y: 80, type: "STANDARD", seats: 4, shape: "rect" },
     { id: "t2", label: "2", x: 240, y: 80, type: "STANDARD", seats: 2, shape: "circle" },
@@ -409,6 +422,17 @@ function SettingsTab() {
     { id: "t4", label: "3", x: 80, y: 200, type: "STANDARD", seats: 4, shape: "circle" },
     { id: "t5", label: "Бар", x: 300, y: 200, type: "BAR", seats: 2, shape: "circle" },
   ]);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "error">("idle");
+  const [tablesLoaded, setTablesLoaded] = useState(false);
+
+  // Синхронизация с сервером при загрузке
+  if (layoutQuery.data && !tablesLoaded) {
+    const serverTables = layoutQuery.data.tables;
+    if (serverTables.length > 0) {
+      setTables(serverTables.map((t: { id: string; label: string; x: number; y: number; type: string; seats: number; shape: string }) => ({ ...t, shape: (t.shape as "circle" | "rect") || "rect" })));
+    }
+    setTablesLoaded(true);
+  }
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [selectedEditor, setSelectedEditor] = useState<string | null>(null);
@@ -481,7 +505,19 @@ function SettingsTab() {
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <button className="btn btn-secondary btn-sm" onClick={addTable} style={{ gap: 4 }}><Plus size={14} /> Добавить стол</button>
-                <button className="btn btn-primary btn-sm">Сохранить</button>
+                <button
+                  className="btn btn-primary btn-sm"
+                  disabled={saveLayoutMut.isPending}
+                  onClick={() => {
+                    setSaveStatus("idle");
+                    saveLayoutMut.mutate({
+                      hallId: layoutQuery.data?.hallId || "demo-hall",
+                      tables: tables.map(({ id, ...rest }) => ({ ...rest, id, type: rest.type as "STANDARD" | "VIP" | "BAR" | "TERRACE" | "PRIVATE" | "LOUNGE" })),
+                    });
+                  }}
+                >
+                  {saveLayoutMut.isPending ? "Сохранение..." : saveStatus === "saved" ? "Сохранено" : "Сохранить"}
+                </button>
               </div>
             </div>
 
