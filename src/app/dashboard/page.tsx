@@ -81,6 +81,11 @@ function VenuesTab() {
   // Live data из PostgreSQL
   const trpc = useTRPC();
   const bookingsQuery = useQuery(trpc.booking.myRestaurantBookings.queryOptions());
+  const updateStatusMut = useMutation(
+    trpc.booking.updateStatus.mutationOptions({
+      onSuccess: () => { bookingsQuery.refetch(); setSelectedBooking(null); },
+    })
+  );
 
   // Адаптер: преобразуем Prisma формат в UI формат
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -236,21 +241,29 @@ function VenuesTab() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {b.status === "new" && (
-                <button className="btn btn-primary" style={{ width: "100%", gap: 6, justifyContent: "center" }}>
-                  <CheckCircle2 size={16} /> Подтвердить бронь
+                <button className="btn btn-primary" style={{ width: "100%", gap: 6, justifyContent: "center" }}
+                  disabled={updateStatusMut.isPending}
+                  onClick={() => updateStatusMut.mutate({ bookingId: String(b.id), status: "CONFIRMED" })}>
+                  <CheckCircle2 size={16} /> {updateStatusMut.isPending ? "Обновление..." : "Подтвердить бронь"}
                 </button>
               )}
               {(b.status === "new" || b.status === "confirmed") && (
-                <button className="btn btn-primary" style={{ width: "100%", gap: 6, justifyContent: "center", background: "var(--color-success)" }}>
+                <button className="btn btn-primary" style={{ width: "100%", gap: 6, justifyContent: "center", background: "var(--color-success)" }}
+                  disabled={updateStatusMut.isPending}
+                  onClick={() => updateStatusMut.mutate({ bookingId: String(b.id), status: "SEATED" })}>
                   <UserCheck size={16} /> Открыть (сели гости)
                 </button>
               )}
               {b.status === "seated" && (
-                <button className="btn btn-secondary" style={{ width: "100%", gap: 6, justifyContent: "center" }}>
+                <button className="btn btn-secondary" style={{ width: "100%", gap: 6, justifyContent: "center" }}
+                  disabled={updateStatusMut.isPending}
+                  onClick={() => updateStatusMut.mutate({ bookingId: String(b.id), status: "COMPLETED" })}>
                   <Clock size={16} /> Закрыть визит
                 </button>
               )}
-              <button className="btn btn-ghost" style={{ width: "100%", gap: 6, justifyContent: "center", color: "var(--color-error)" }}>
+              <button className="btn btn-ghost" style={{ width: "100%", gap: 6, justifyContent: "center", color: "var(--color-error)" }}
+                disabled={updateStatusMut.isPending}
+                onClick={() => updateStatusMut.mutate({ bookingId: String(b.id), status: "CANCELLED" })}>
                 <XCircle size={16} /> Отменить
               </button>
             </div>
