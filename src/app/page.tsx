@@ -279,6 +279,7 @@ function Filters({
 }
 
 function RestaurantCard({ restaurant }: { restaurant: typeof MOCK_RESTAURANTS[number] }) {
+  const desc = (restaurant as Record<string, unknown>).description as string;
   return (
     <Link href={`/restaurant/${restaurant.slug}`} style={{ textDecoration: "none" }}>
       <div className="card" style={{ cursor: "pointer" }}>
@@ -304,6 +305,18 @@ function RestaurantCard({ restaurant }: { restaurant: typeof MOCK_RESTAURANTS[nu
             <PriceIndicator range={restaurant.priceRange} />
           </div>
           <p style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 10, lineHeight: 1.4 }}>{restaurant.shortDesc}</p>
+
+          {/* Review summary snippet */}
+          {desc && (
+            <p style={{
+              fontSize: 12, color: "var(--color-text-muted)", marginBottom: 10, lineHeight: 1.5,
+              display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+              fontStyle: "italic", borderLeft: "2px solid var(--color-primary)", paddingLeft: 8,
+            }}>
+              {desc}
+            </p>
+          )}
+
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
             <RatingStars rating={restaurant.avgRating} />
             <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-primary)" }}>{restaurant.avgRating}</span>
