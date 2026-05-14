@@ -66,7 +66,7 @@ function Header() {
             fontSize: 18, fontWeight: 500, color: "#ffffff",
           }}>R</div>
           <span style={{ fontSize: 18, fontWeight: 500, color: "var(--color-text-primary)", letterSpacing: "-0.01em" }}>
-            REST<span style={{ color: "var(--color-primary)" }}>Booking</span>
+            RESTO<span style={{ color: "var(--color-primary)" }}>booking</span>
           </span>
         </Link>
         <nav style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -424,7 +424,7 @@ function Footer() {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 14, fontWeight: 500, color: "#ffffff",
             }}>R</div>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>REST<span style={{ color: "var(--color-primary)" }}>Booking</span></span>
+            <span style={{ fontSize: 15, fontWeight: 500 }}>RESTO<span style={{ color: "var(--color-primary)" }}>booking</span></span>
           </div>
           <p style={{ fontSize: 13, color: "var(--color-text-muted)", maxWidth: 260 }}>
             Сервис бронирования и книга резервов для ресторанов

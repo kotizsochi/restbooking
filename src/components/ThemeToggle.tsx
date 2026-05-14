@@ -7,7 +7,7 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    const saved = localStorage.getItem("restbooking-theme");
+    const saved = localStorage.getItem("restobooking-theme");
     if (saved === "dark" || saved === "light") {
       setTheme(saved);
       document.documentElement.setAttribute("data-theme", saved);
@@ -20,7 +20,7 @@ export function ThemeToggle() {
     const next = theme === "light" ? "dark" : "light";
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("restbooking-theme", next);
+    localStorage.setItem("restobooking-theme", next);
   };
 
   return (

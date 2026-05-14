@@ -165,7 +165,7 @@ function BookingForm({ table, timeFrom, onClose }: { table: TableInfo; timeFrom:
           style={{ width: "100%", marginTop: 16, padding: "12px", background: name && phone ? "#927555" : "#ccc", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: name && phone ? "pointer" : "not-allowed" }}>
           ЗАБРОНИРОВАТЬ
         </button>
-        <p style={{ fontSize: 11, color: "#999", textAlign: "center", marginTop: 8 }}>Сервис бронирования RESTBooking</p>
+        <p style={{ fontSize: 11, color: "#999", textAlign: "center", marginTop: 8 }}>Сервис бронирования RESTObooking</p>
       </div>
     </div>
   );
@@ -361,7 +361,7 @@ export default function WidgetPage() {
 
       {/* Footer */}
       <div style={{ padding: "6px 20px 10px", textAlign: "center" }}>
-        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)" }}>Сервис бронирования RESTBooking</span>
+        <span style={{ fontSize: 10, color: "rgba(255,255,255,0.2)" }}>Сервис бронирования RESTObooking</span>
       </div>
 
       {/* Booking modal */}

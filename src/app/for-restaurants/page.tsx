@@ -11,7 +11,7 @@ import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
 
 const FEATURES = [
   { icon: BookOpen, title: "Электронная книга резервов", desc: "Все бронирования в реальном времени с автообновлением.", details: ["Календарь на день/неделю/месяц", "Статусы броней", "История визитов гостя"] },
-  { icon: Globe, title: "Онлайн прием броней", desc: "Виджет бронирования на вашем сайте. 24/7 без участия персонала.", details: ["Встраиваемый виджет", "Страница на RESTBooking", "Автоподтверждение"] },
+  { icon: Globe, title: "Онлайн прием броней", desc: "Виджет бронирования на вашем сайте. 24/7 без участия персонала.", details: ["Встраиваемый виджет", "Страница на RESTObooking", "Автоподтверждение"] },
   { icon: CreditCard, title: "Депозиты онлайн", desc: "Снижение no-show до 5%. Автоматический расчет депозитов.", details: ["Гибкая настройка суммы", "Пиковые надбавки", "Возврат при отмене"] },
   { icon: Smartphone, title: "Приложение для хостес", desc: "Мобильный интерфейс для управления посадкой.", details: ["Карта столов", "Быстрый чек-ин", "Push-уведомления"] },
   { icon: Plug, title: "Интеграции CRM", desc: "Двусторонняя синхронизация с вашей POS-системой.", details: ["iiko, r_keeper, SmartReserve", "Webhook и REST API", "Автосинхронизация"] },
@@ -22,7 +22,7 @@ const TARIFFS = [
   { name: "Free", price: "0", period: "навсегда", desc: "Бесплатно", features: ["До 300 заявок в мес", "Книга резервов для хостес", "Виджет для сайта", "Уведомления по SMS и TG", "Интеграция с Я.Еда"], cta: "Начать бесплатно", highlighted: false },
   { name: "Mini", price: "2 550", period: "руб/мес", desc: "за 1 заведение", features: ["Заявки без ограничений", "Книга резервов и схема зала", "Форма бронирования", "Лист ожидания (очередь)", "Банкеты", "Сервисы аналитики"], cta: "Попробовать 14 дней", highlighted: false },
   { name: "PRO", price: "4 310", period: "руб/мес", desc: "за 1 заведение", features: ["Все из Mini, плюс:", "Депозиты без комиссии", "Звонки с облачными АТС", "Статистика заведения", "База гостей и черный список", "Полная история резервов"], cta: "Попробовать 14 дней", highlighted: true },
-  { name: "PRO +", price: "5 190", period: "руб/мес", desc: "за 1 заведение", features: ["Все из PRO, плюс:", "Выключение лейбла", "Продажа билетов", "Сертификаты и промокоды", "Интеграции с POS: iiko, r_keeper", "Интеграции с CRM: Битрикс24, AmoCRM", "API RESTBooking"], cta: "Попробовать 14 дней", highlighted: false },
+  { name: "PRO +", price: "5 190", period: "руб/мес", desc: "за 1 заведение", features: ["Все из PRO, плюс:", "Выключение лейбла", "Продажа билетов", "Сертификаты и промокоды", "Интеграции с POS: iiko, r_keeper", "Интеграции с CRM: Битрикс24, AmoCRM", "API RESTObooking"], cta: "Попробовать 14 дней", highlighted: false },
 ];
 
 const DAYS = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
@@ -185,7 +185,7 @@ export default function ForRestaurantsPage() {
         <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
             <div style={{ width: 36, height: 36, borderRadius: "var(--radius-md)", background: "var(--color-primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 500, color: "#fff" }}>R</div>
-            <span style={{ fontSize: 18, fontWeight: 500, color: "var(--color-text-primary)" }}>REST<span style={{ color: "var(--color-primary)" }}>Booking</span></span>
+            <span style={{ fontSize: 18, fontWeight: 500, color: "var(--color-text-primary)" }}>RESTO<span style={{ color: "var(--color-primary)" }}>Booking</span></span>
           </Link>
           <nav style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <ThemeToggle />
@@ -263,7 +263,7 @@ export default function ForRestaurantsPage() {
       </section>
 
       <footer style={{ padding: "28px 0", background: "var(--color-bg-secondary)", textAlign: "center" }}>
-        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>RESTBooking 2026. Сервис бронирования и книга резервов.</p>
+        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>RESTObooking 2026. Сервис бронирования и книга резервов.</p>
       </footer>
     </div>
   );

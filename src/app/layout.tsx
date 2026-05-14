@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RESTBooking - Бронирование ресторанов онлайн",
+  title: "RESTObooking - Бронирование ресторанов онлайн",
   description:
     "Забронируйте лучший столик в ресторанах Москвы, Петербурга и других городов. Реальная доступность, мгновенное подтверждение, депозиты онлайн.",
   keywords: [
@@ -11,10 +11,10 @@ export const metadata: Metadata = {
     "рестораны Москвы",
     "рестораны Петербурга",
     "онлайн бронирование",
-    "RESTBooking",
+    "RESTObooking",
   ],
   openGraph: {
-    title: "RESTBooking - Бронирование ресторанов",
+    title: "RESTObooking - Бронирование ресторанов",
     description: "Найдите и забронируйте столик в лучших ресторанах",
     type: "website",
     locale: "ru_RU",
