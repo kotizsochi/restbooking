@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  BookOpen, Bell, CreditCard, Smartphone, Plug, BarChart3,
+  BookOpen, Bell, CreditCard, Smartphone, Plug,
   ArrowRight, ArrowLeft, CheckCircle2, Globe,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
 
 const FEATURES = [
@@ -181,18 +182,7 @@ function RegistrationForm() {
 export default function ForRestaurantsPage() {
   return (
     <div style={{ minHeight: "100vh" }}>
-      <header className="glass-card" style={{ position: "sticky", top: 0, zIndex: 50, borderRadius: 0 }}>
-        <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-            <div style={{ width: 36, height: 36, borderRadius: "var(--radius-md)", background: "var(--color-primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 500, color: "#fff" }}>R</div>
-            <span style={{ fontSize: 18, fontWeight: 500, color: "var(--color-text-primary)" }}>RESTO<span style={{ color: "var(--color-primary)" }}>Booking</span></span>
-          </Link>
-          <nav style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <ThemeToggle />
-            <Link href="/" className="btn btn-ghost btn-sm" style={{ textDecoration: "none" }}>Для гостей</Link>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <section style={{ padding: "clamp(48px, 8vw, 80px) 0 40px", textAlign: "center" }}>
         <div className="container">
@@ -262,9 +252,7 @@ export default function ForRestaurantsPage() {
         </div>
       </section>
 
-      <footer style={{ padding: "28px 0", background: "var(--color-bg-secondary)", textAlign: "center" }}>
-        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>RESTObooking 2026. Сервис бронирования и книга резервов.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
