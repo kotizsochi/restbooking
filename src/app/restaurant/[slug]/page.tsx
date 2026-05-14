@@ -6,11 +6,12 @@ import Link from "next/link";
 import {
   ArrowLeft, Star, MapPin, Clock, Users, Calendar,
   Phone, Globe, Wine, ChevronDown, Check, AlertCircle,
-  Utensils, Music, Car, Eye, Waves, Heart,
+  Utensils, Music, Car, Eye, Waves, Heart, List, LayoutGrid,
 } from "lucide-react";
 import { MOCK_RESTAURANTS, getAvailableSlots } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
+import { FloorPlan } from "@/components/FloorPlan";
 
 const CUISINE_LABELS: Record<string, string> = {
   RUSSIAN: "Русская", ITALIAN: "Итальянская", JAPANESE: "Японская",
@@ -56,6 +57,7 @@ export default function RestaurantPage() {
   });
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
+  const [tableView, setTableView] = useState<"list" | "map">("list");
   const [bookingStep, setBookingStep] = useState<BookingStep>("select");
   const [specialRequests, setSpecialRequests] = useState("");
   const [guestName, setGuestName] = useState("");
@@ -285,29 +287,57 @@ export default function RestaurantPage() {
                   {/* Table Selection */}
                   {selectedSlot && (
                     <div style={{ marginBottom: 20 }}>
-                      <label className="input-label">Выберите стол</label>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        {selectedSlot.tables.map((table) => (
-                          <button key={table.id}
-                            onClick={() => setSelectedTable(table.id)}
-                            style={{
-                              display: "flex", justifyContent: "space-between", alignItems: "center",
-                              padding: "12px 16px", borderRadius: "var(--radius-md)",
-                              border: `1px solid ${selectedTable === table.id ? "var(--color-primary)" : "var(--color-border)"}`,
-                              background: selectedTable === table.id ? "rgba(200, 169, 126, 0.08)" : "var(--color-bg-secondary)",
-                              cursor: "pointer", transition: "all var(--transition-fast)",
-                              color: "var(--color-text-primary)", textAlign: "left",
-                            }}>
-                            <div>
-                              <span style={{ fontWeight: 400, fontSize: 14 }}>Стол {table.label}</span>
-                              <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 8 }}>
-                                {TABLE_TYPE_LABELS[table.tableType]} / {table.minCapacity}-{table.maxCapacity} мест
-                              </span>
-                            </div>
-                            {selectedTable === table.id && <Check size={16} style={{ color: "var(--color-primary)" }} />}
-                          </button>
-                        ))}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <label className="input-label" style={{ marginBottom: 0 }}>Выберите стол</label>
+                        <div style={{ display: "flex", gap: 2, background: "var(--color-bg-secondary)", borderRadius: "var(--radius-sm)", padding: 2 }}>
+                          <button onClick={() => setTableView("list")} style={{
+                            padding: "4px 8px", border: "none", borderRadius: "var(--radius-sm)", cursor: "pointer",
+                            background: tableView === "list" ? "var(--color-bg-card)" : "transparent",
+                            color: tableView === "list" ? "var(--color-primary)" : "var(--color-text-muted)",
+                            boxShadow: tableView === "list" ? "var(--shadow-xs)" : "none",
+                            transition: "all var(--transition-fast)",
+                          }}><List size={14} /></button>
+                          <button onClick={() => setTableView("map")} style={{
+                            padding: "4px 8px", border: "none", borderRadius: "var(--radius-sm)", cursor: "pointer",
+                            background: tableView === "map" ? "var(--color-bg-card)" : "transparent",
+                            color: tableView === "map" ? "var(--color-primary)" : "var(--color-text-muted)",
+                            boxShadow: tableView === "map" ? "var(--shadow-xs)" : "none",
+                            transition: "all var(--transition-fast)",
+                          }}><LayoutGrid size={14} /></button>
+                        </div>
                       </div>
+
+                      {tableView === "map" ? (
+                        <FloorPlan
+                          tables={selectedSlot.tables}
+                          selectedTable={selectedTable}
+                          onSelectTable={setSelectedTable}
+                          guestCount={guestCount}
+                        />
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                          {selectedSlot.tables.map((table) => (
+                            <button key={table.id}
+                              onClick={() => setSelectedTable(table.id)}
+                              style={{
+                                display: "flex", justifyContent: "space-between", alignItems: "center",
+                                padding: "12px 16px", borderRadius: "var(--radius-md)",
+                                border: `1px solid ${selectedTable === table.id ? "var(--color-primary)" : "var(--color-border)"}`,
+                                background: selectedTable === table.id ? "rgba(200, 169, 126, 0.08)" : "var(--color-bg-secondary)",
+                                cursor: "pointer", transition: "all var(--transition-fast)",
+                                color: "var(--color-text-primary)", textAlign: "left",
+                              }}>
+                              <div>
+                                <span style={{ fontWeight: 400, fontSize: 14 }}>Стол {table.label}</span>
+                                <span style={{ fontSize: 12, color: "var(--color-text-muted)", marginLeft: 8 }}>
+                                  {TABLE_TYPE_LABELS[table.tableType]} / {table.minCapacity}-{table.maxCapacity} мест
+                                </span>
+                              </div>
+                              {selectedTable === table.id && <Check size={16} style={{ color: "var(--color-primary)" }} />}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
