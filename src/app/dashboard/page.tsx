@@ -5,10 +5,8 @@ import { useDebounce } from "@/lib/hooks";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import {
-  Building, CreditCard, Users, BarChart3, Settings, Plus,
-  Search, ChevronRight, Clock, CheckCircle2, XCircle, Eye,
-  Phone, Mail, Calendar, MapPin, Star, Bell, ArrowRight,
-  TrendingUp, UserCheck, UserX, Filter, Trash2, Move, LayoutGrid,
+  Settings, Plus, Search, Clock, CheckCircle2, XCircle, Eye,
+  Phone, Bell, UserCheck, Trash2, LayoutGrid,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTRPC } from "@/lib/trpc";
@@ -279,7 +277,7 @@ function VenuesTab() {
             </div>
 
             <div style={{ marginTop: 16, padding: 12, background: "var(--color-bg-elevated)", borderRadius: "var(--radius-sm)", fontSize: 12, color: "var(--color-text-muted)", textAlign: "center" }}>
-              Пока открыта форма, гости не смогут забронировать "Стол"
+              Пока открыта форма, гости не смогут забронировать этот стол
             </div>
           </aside>
         );

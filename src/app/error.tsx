@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Error({
   error,
   reset,
@@ -27,9 +29,9 @@ export default function Error({
           <button className="btn btn-primary btn-sm" onClick={reset}>
             Попробовать снова
           </button>
-          <a href="/" className="btn btn-secondary btn-sm" style={{ textDecoration: "none" }}>
+          <Link href="/" className="btn btn-secondary btn-sm" style={{ textDecoration: "none" }}>
             На главную
-          </a>
+          </Link>
         </div>
       </div>
     </div>

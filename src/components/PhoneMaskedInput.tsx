@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 
 function formatPhone(value: string): string {
   const digits = value.replace(/\D/g, "");

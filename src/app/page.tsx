@@ -3,9 +3,9 @@
 import { useState, useMemo } from "react";
 import {
   Search, MapPin, Users, Calendar, Star, ChevronRight, Clock,
-  Utensils, Wine, Shield, SlidersHorizontal, X,
+  Utensils, Shield, SlidersHorizontal, X,
   BookOpen, Bell, CreditCard, Smartphone, Plug, BarChart3,
-  ArrowRight, CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { MOCK_RESTAURANTS } from "@/lib/mock-data";
 import Link from "next/link";

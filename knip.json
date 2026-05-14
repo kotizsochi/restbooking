@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "src/app/**/*.{ts,tsx}",
+    "src/server/**/*.ts",
+    "src/lib/**/*.ts",
+    "prisma/seed.ts"
+  ],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": [
+    "src/env.ts"
+  ],
+  "ignoreDependencies": [
+    "@types/*",
+    "eslint-config-next",
+    "prisma"
+  ],
+  "next": {
+    "entry": ["src/app/**/*.{ts,tsx}", "next.config.ts", "src/middleware.ts"]
+  }
+}

@@ -16,8 +16,8 @@ export default function PrivacyPage() {
 
       <div style={{ fontSize: 14, color: "var(--color-text-secondary)", lineHeight: 1.8 }}>
         <p style={{ marginBottom: 16 }}>
-          Настоящая Политика конфиденциальности (далее "Политика") определяет порядок обработки и защиты
-          персональных данных пользователей сервиса RESTObooking (далее "Сервис").
+          Настоящая Политика конфиденциальности (далее {"\"Политика\""}) определяет порядок обработки и защиты
+          персональных данных пользователей сервиса RESTObooking (далее {"\"Сервис\""}).
         </p>
 
         <h2 style={{ fontSize: 18, fontWeight: 500, marginTop: 32, marginBottom: 12, color: "var(--color-text-primary)" }}>1. Какие данные мы собираем</h2>

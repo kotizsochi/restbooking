@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import {
-  Phone, MapPin, ChevronDown, Users, X, CheckCircle2,
-  Clock, CalendarDays, List, LayoutGrid, UserPlus,
+  Phone, Users, X, CheckCircle2,
+  CalendarDays, LayoutGrid,
 } from "lucide-react";
 import { useTRPC } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
@@ -15,8 +15,7 @@ function minutesToTime(m: number) { return `${pad(Math.floor(m / 60))}:${pad(m %
 function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)); }
 function snap10(v: number) { return Math.round(v / 10) * 10; }
 
-/* ---- mock data ---- */
-const ZONES = ["Все залы", "Основной зал", "Веранда", "VIP"];
+
 
 interface TableInfo {
   id: number; number: string; zone: string; seats: number;

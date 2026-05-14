@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowLeft, Star, MapPin, Clock, Users, Calendar,
-  Phone, Globe, Wine, ChevronDown, Check, AlertCircle,
+  Check, AlertCircle, Wine,
   Utensils, Music, Car, Eye, Waves, Heart, List, LayoutGrid,
 } from "lucide-react";
 import { MOCK_RESTAURANTS, getAvailableSlots } from "@/lib/mock-data";
