@@ -1,0 +1,426 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// ПОЛЬЗОВАТЕЛИ
+// ==========================================
+
+enum UserRole {
+  GUEST
+  RESTAURANT_ADMIN
+  RESTAURANT_HOSTESS
+  PLATFORM_ADMIN
+}
+
+enum LoyaltyLevel {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  phone         String?      @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          UserRole     @default(GUEST)
+  loyaltyLevel  LoyaltyLevel @default(BRONZE)
+  loyaltyPoints Int          @default(0)
+  preferences   Json?
+  telegramId    String?      @unique
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  reservations  Reservation[]
+  reviews       Review[]
+  favorites     Favorite[]
+  restaurant    Restaurant?  @relation("RestaurantOwner")
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ==========================================
+// РЕСТОРАНЫ
+// ==========================================
+
+enum CuisineType {
+  RUSSIAN
+  ITALIAN
+  JAPANESE
+  CHINESE
+  GEORGIAN
+  FRENCH
+  AMERICAN
+  MEXICAN
+  INDIAN
+  THAI
+  KOREAN
+  MEDITERRANEAN
+  SEAFOOD
+  STEAKHOUSE
+  VEGETARIAN
+  FUSION
+  OTHER
+}
+
+enum PriceRange {
+  BUDGET
+  MODERATE
+  PREMIUM
+  LUXURY
+}
+
+enum CRMProvider {
+  RESTOPLACE
+  SMARTRESERVE
+  IIKO
+  RKEEPER
+  QUICKRESTO
+  MANUAL
+}
+
+model Restaurant {
+  id          String      @id @default(cuid())
+  ownerId     String      @unique
+  name        String
+  slug        String      @unique
+  description String?
+  shortDesc   String?
+  cuisine     CuisineType[]
+  priceRange  PriceRange  @default(MODERATE)
+  city        String
+  address     String
+  latitude    Float?
+  longitude   Float?
+  phone       String?
+  website     String?
+  email       String?
+  
+  coverImage  String?
+  logoImage   String?
+  photos      String[]
+
+  features    String[]
+  avgRating   Float       @default(0)
+  reviewCount Int         @default(0)
+  
+  openingTime String      @default("10:00")
+  closingTime String      @default("23:00")
+  workingDays Int[]       @default([1, 2, 3, 4, 5, 6, 7])
+  
+  slotDuration   Int      @default(120)
+  bookingBuffer  Int      @default(30)
+  maxPartySize   Int      @default(12)
+  depositRequired Boolean @default(false)
+  depositAmount  Float?
+  depositPercent Float?
+
+  crmProvider    CRMProvider @default(MANUAL)
+  crmConfig      Json?
+  crmExternalId  String?
+
+  isActive    Boolean     @default(true)
+  isVerified  Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  owner       User        @relation("RestaurantOwner", fields: [ownerId], references: [id])
+  halls       Hall[]
+  tables      Table[]
+  timeSlots   TimeSlot[]
+  reservations Reservation[]
+  reviews     Review[]
+  favorites   Favorite[]
+  crmSyncLogs CRMSyncLog[]
+
+  @@index([city])
+  @@index([avgRating])
+  @@index([slug])
+  @@map("restaurants")
+}
+
+// ==========================================
+// ЗАЛЫ И СТОЛЫ
+// ==========================================
+
+model Hall {
+  id           String     @id @default(cuid())
+  restaurantId String
+  name         String
+  description  String?
+  floorPlanSvg String?
+  sortOrder    Int        @default(0)
+  isActive     Boolean    @default(true)
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  tables       Table[]
+
+  @@map("halls")
+}
+
+enum TableType {
+  STANDARD
+  VIP
+  BAR
+  TERRACE
+  PRIVATE
+  LOUNGE
+}
+
+model Table {
+  id           String     @id @default(cuid())
+  restaurantId String
+  hallId       String?
+  label        String
+  minCapacity  Int        @default(1)
+  maxCapacity  Int        @default(4)
+  tableType    TableType  @default(STANDARD)
+  positionX    Float?
+  positionY    Float?
+  tags         String[]
+  isActive     Boolean    @default(true)
+  crmTableId   String?
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  hall         Hall?      @relation(fields: [hallId], references: [id])
+  reservations Reservation[]
+  slotTables   SlotTable[]
+
+  @@map("tables")
+}
+
+// ==========================================
+// СЛОТЫ ВРЕМЕНИ
+// ==========================================
+
+model TimeSlot {
+  id           String     @id @default(cuid())
+  restaurantId String
+  date         DateTime   @db.Date
+  startTime    String
+  endTime      String
+  isPeak       Boolean    @default(false)
+  depositMultiplier Float @default(1.0)
+  isActive     Boolean    @default(true)
+
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  slotTables   SlotTable[]
+  reservations Reservation[]
+
+  @@unique([restaurantId, date, startTime])
+  @@index([date])
+  @@map("time_slots")
+}
+
+model SlotTable {
+  id         String   @id @default(cuid())
+  slotId     String
+  tableId    String
+  isAvailable Boolean @default(true)
+
+  slot       TimeSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  table      Table    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@unique([slotId, tableId])
+  @@map("slot_tables")
+}
+
+// ==========================================
+// БРОНИРОВАНИЯ
+// ==========================================
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  SEATED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  NONE
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum ReservationSource {
+  PLATFORM_WEB
+  PLATFORM_MOBILE
+  TELEGRAM_BOT
+  TELEGRAM_MINIAPP
+  WIDGET
+  PHONE
+  WALKIN
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  userId          String
+  restaurantId    String
+  tableId         String?
+  timeSlotId      String?
+  
+  date            DateTime          @db.Date
+  time            String
+  guestCount      Int
+  duration        Int               @default(120)
+  
+  status          ReservationStatus @default(PENDING)
+  specialRequests String?
+  internalNotes   String?
+  
+  depositAmount   Float?
+  paymentStatus   PaymentStatus     @default(NONE)
+  paymentId       String?
+  
+  source          ReservationSource @default(PLATFORM_WEB)
+  crmReservationId String?
+  
+  confirmedAt     DateTime?
+  cancelledAt     DateTime?
+  cancelReason    String?
+  
+  loyaltyPointsEarned Int          @default(0)
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user            User              @relation(fields: [userId], references: [id])
+  restaurant      Restaurant        @relation(fields: [restaurantId], references: [id])
+  table           Table?            @relation(fields: [tableId], references: [id])
+  timeSlot        TimeSlot?         @relation(fields: [timeSlotId], references: [id])
+  review          Review?
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([date])
+  @@index([status])
+  @@map("reservations")
+}
+
+// ==========================================
+// ОТЗЫВЫ
+// ==========================================
+
+model Review {
+  id             String      @id @default(cuid())
+  userId         String
+  restaurantId   String
+  reservationId  String      @unique
+  
+  rating         Int
+  foodRating     Int?
+  serviceRating  Int?
+  ambianceRating Int?
+  text           String?
+  photos         String[]
+  
+  replyText      String?
+  repliedAt      DateTime?
+  
+  isPublished    Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  user           User        @relation(fields: [userId], references: [id])
+  restaurant     Restaurant  @relation(fields: [restaurantId], references: [id])
+  reservation    Reservation @relation(fields: [reservationId], references: [id])
+
+  @@index([restaurantId])
+  @@map("reviews")
+}
+
+// ==========================================
+// ИЗБРАННОЕ
+// ==========================================
+
+model Favorite {
+  id           String     @id @default(cuid())
+  userId       String
+  restaurantId String
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+  @@map("favorites")
+}
+
+// ==========================================
+// CRM SYNC
+// ==========================================
+
+enum SyncDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum SyncStatus {
+  SUCCESS
+  FAILED
+  PENDING
+}
+
+model CRMSyncLog {
+  id           String        @id @default(cuid())
+  restaurantId String
+  direction    SyncDirection
+  action       String
+  payload      Json?
+  response     Json?
+  status       SyncStatus    @default(PENDING)
+  errorMessage String?
+  createdAt    DateTime      @default(now())
+
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId])
+  @@index([createdAt])
+  @@map("crm_sync_logs")
+}
