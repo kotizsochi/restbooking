@@ -21,6 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ...(prisma ? { adapter: PrismaAdapter(prisma) as ReturnType<typeof PrismaAdapter> } : {}),
   session: {
     strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60, // 7 дней
   },
   pages: {
     signIn: "/login",

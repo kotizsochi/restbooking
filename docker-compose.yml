@@ -7,6 +7,7 @@ services:
       - DATABASE_URL=postgresql://restbooking:${DB_PASSWORD}@db:5432/restbooking
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_URL=${AUTH_URL:-http://localhost:3000}
+      - APP_URL=${APP_URL:-http://localhost:3000}
       - DEMO_MODE=${DEMO_MODE:-false}
       - NEXT_PUBLIC_YM_ID=${NEXT_PUBLIC_YM_ID:-}
       - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID:-}
@@ -14,6 +15,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
   db:
