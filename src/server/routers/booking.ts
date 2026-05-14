@@ -115,6 +115,41 @@ export const bookingRouter = router({
       return reservation;
     }),
 
+  // Отмена бронирования (публичный - по ID)
+  cancel: publicProcedure
+    .input(z.object({ bookingId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.prisma) return { success: true };
+      const booking = await ctx.prisma.reservation.findUnique({
+        where: { id: input.bookingId },
+      });
+      if (!booking) throw new Error("Бронирование не найдено");
+      if (booking.status === "CANCELLED" || booking.status === "COMPLETED") {
+        throw new Error("Невозможно отменить");
+      }
+      await ctx.prisma.reservation.update({
+        where: { id: input.bookingId },
+        data: { status: "CANCELLED" },
+      });
+      return { success: true };
+    }),
+
+  // Обновить статус бронирования (админ)
+  updateStatus: adminProcedure
+    .input(
+      z.object({
+        bookingId: z.string(),
+        status: z.enum(["PENDING", "CONFIRMED", "SEATED", "COMPLETED", "CANCELLED", "NO_SHOW"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const booking = await ctx.prisma.reservation.update({
+        where: { id: input.bookingId },
+        data: { status: input.status },
+      });
+      return booking;
+    }),
+
   // Получить бронирования ресторана (админ)
   listByRestaurant: adminProcedure
     .input(
