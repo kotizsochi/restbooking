@@ -11,6 +11,8 @@ import { MOCK_RESTAURANTS } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useTRPC } from "@/lib/trpc";
+import { useQuery } from "@tanstack/react-query";
 
 const CITIES = ["Все города", "Москва", "Санкт-Петербург", "Сочи"];
 const GUEST_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -284,8 +286,9 @@ function Filters({
   );
 }
 
-function RestaurantCard({ restaurant }: { restaurant: typeof MOCK_RESTAURANTS[number] }) {
-  const desc = (restaurant as Record<string, unknown>).description as string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function RestaurantCard({ restaurant }: { restaurant: any }) {
+  const desc = restaurant.description || restaurant.shortDesc || "";
   return (
     <Link href={`/restaurant/${restaurant.slug}`} style={{ textDecoration: "none" }}>
       <div className="card" style={{ cursor: "pointer" }}>
@@ -329,7 +332,7 @@ function RestaurantCard({ restaurant }: { restaurant: typeof MOCK_RESTAURANTS[nu
             <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>({restaurant.reviewCount})</span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 10 }}>
-            {restaurant.cuisine.map((c) => (
+            {restaurant.cuisine.map((c: string) => (
               <span key={c} className="feature-tag">{CUISINE_LABELS[c] || c}</span>
             ))}
           </div>
@@ -472,15 +475,25 @@ export default function HomePage() {
   const [priceFilter, setPriceFilter] = useState<string[]>([]);
   const [ratingFilter, setRatingFilter] = useState(0);
 
+  // Live data из PostgreSQL через tRPC
+  const trpc = useTRPC();
+  const liveQuery = useQuery(trpc.restaurant.list.queryOptions({
+    city: filteredCity !== "Все города" ? filteredCity : undefined,
+    cuisine: cuisineFilter.length === 1 ? cuisineFilter[0] : undefined,
+    limit: 50,
+  }));
+
   const restaurants = useMemo(() => {
-    return MOCK_RESTAURANTS.filter((r) => {
+    // Приоритет: live данные из БД, fallback на mock
+    const source = liveQuery.data?.restaurants ?? MOCK_RESTAURANTS;
+    return source.filter((r: { city: string; cuisine: string[]; priceRange: string; avgRating: number }) => {
       if (filteredCity !== "Все города" && r.city !== filteredCity) return false;
-      if (cuisineFilter.length > 0 && !r.cuisine.some((c) => cuisineFilter.includes(c))) return false;
+      if (cuisineFilter.length > 0 && !r.cuisine.some((c: string) => cuisineFilter.includes(c))) return false;
       if (priceFilter.length > 0 && !priceFilter.includes(r.priceRange)) return false;
       if (ratingFilter > 0 && r.avgRating < ratingFilter) return false;
       return true;
     });
-  }, [filteredCity, cuisineFilter, priceFilter, ratingFilter]);
+  }, [filteredCity, cuisineFilter, priceFilter, ratingFilter, liveQuery.data]);
 
   return (
     <>
