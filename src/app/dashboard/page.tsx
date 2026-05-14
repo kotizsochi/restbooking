@@ -74,15 +74,42 @@ function DashHeader({ activeTab, setActiveTab, userName }: { activeTab: Tab; set
 
 function VenuesTab() {
   const [filter, setFilter] = useState<"all" | "new" | "confirmed" | "seated" | "cancelled">("all");
-  const [selectedBooking, setSelectedBooking] = useState<typeof MOCK_BOOKINGS[number] | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [search, setSearch] = useState("");
-  const filtered = MOCK_BOOKINGS.filter((b) => {
+
+  // Live data из PostgreSQL
+  const trpc = useTRPC();
+  const bookingsQuery = useQuery(trpc.booking.myRestaurantBookings.queryOptions());
+
+  // Адаптер: преобразуем Prisma формат в UI формат
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const allBookings = (bookingsQuery.data?.bookings || []).length > 0
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ? bookingsQuery.data!.bookings.map((b: any, i: number) => ({
+        id: b.id || i + 1,
+        guest: b.user?.name || "Гость",
+        phone: b.user?.phone || "",
+        guests: b.guestCount || 2,
+        time: b.time || "12:00",
+        table: b.table?.label || "N/A",
+        status: (b.status === "PENDING" ? "new" : b.status === "CONFIRMED" ? "confirmed" : b.status === "SEATED" ? "seated" : b.status === "CANCELLED" ? "cancelled" : "new") as "new" | "confirmed" | "seated" | "cancelled",
+        tags: [] as string[],
+        comment: b.specialRequests || "",
+      }))
+    : MOCK_BOOKINGS;
+
+  const restaurantName = bookingsQuery.data?.restaurant?.name || "Белуга";
+  const restaurantSlug = bookingsQuery.data?.restaurant?.slug || "beluga";
+  const restaurantCity = bookingsQuery.data?.restaurant?.city || "Москва";
+
+  const filtered = allBookings.filter((b) => {
     if (filter !== "all" && b.status !== filter) return false;
     if (search && !b.guest.toLowerCase().includes(search.toLowerCase()) && !b.phone.includes(search)) return false;
     return true;
   });
   const today = new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
-  const counts = { new: MOCK_BOOKINGS.filter(b => b.status === "new").length, confirmed: MOCK_BOOKINGS.filter(b => b.status === "confirmed").length, seated: MOCK_BOOKINGS.filter(b => b.status === "seated").length };
+  const counts = { new: allBookings.filter(b => b.status === "new").length, confirmed: allBookings.filter(b => b.status === "confirmed").length, seated: allBookings.filter(b => b.status === "seated").length };
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: selectedBooking ? "220px 1fr 320px" : "220px 1fr", minHeight: "calc(100vh - 56px)", transition: "all 0.3s ease" }}>
@@ -91,8 +118,8 @@ function VenuesTab() {
         <h4 style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-muted)", letterSpacing: "0.1em", marginBottom: 12 }}>ЗАВЕДЕНИЯ</h4>
         <div style={{ padding: "10px 12px", background: "var(--color-primary)", borderRadius: "var(--radius-md)", color: "#fff", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
           <div>
-            <div style={{ fontWeight: 500 }}>Белуга</div>
-            <div style={{ fontSize: 11, opacity: 0.8 }}>Москва</div>
+            <div style={{ fontWeight: 500 }}>{restaurantName}</div>
+            <div style={{ fontSize: 11, opacity: 0.8 }}>{restaurantCity}</div>
           </div>
           <span style={{ fontSize: 10, padding: "2px 6px", background: "rgba(255,255,255,0.2)", borderRadius: 4 }}>PRO+</span>
         </div>
@@ -106,8 +133,8 @@ function VenuesTab() {
       <main style={{ padding: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
           <div>
-            <h2 style={{ fontSize: 22, fontWeight: 500 }}>Белуга</h2>
-            <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Виджет: <span style={{ color: "var(--color-primary)" }}>beluga.restobooking.ru</span></p>
+            <h2 style={{ fontSize: 22, fontWeight: 500 }}>{restaurantName}</h2>
+            <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Виджет: <span style={{ color: "var(--color-primary)" }}>{restaurantSlug}.restobooking.ru</span></p>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="btn btn-secondary btn-sm" style={{ gap: 4 }}><Settings size={14} /> Настройки</button>
@@ -181,7 +208,7 @@ function VenuesTab() {
       {/* Detail panel */}
       {selectedBooking && (() => {
         const b = selectedBooking;
-        const st = STATUS_MAP[b.status];
+        const st = STATUS_MAP[b.status as keyof typeof STATUS_MAP];
         return (
           <aside style={{ background: "var(--color-bg-card)", borderLeft: "1px solid var(--color-border)", padding: 20, overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -201,7 +228,7 @@ function VenuesTab() {
 
             {b.tags.length > 0 && (
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 16 }}>
-                {b.tags.map((tag) => <span key={tag} className="feature-tag">{tag}</span>)}
+                {b.tags.map((tag: string) => <span key={tag} className="feature-tag">{tag}</span>)}
               </div>
             )}
 

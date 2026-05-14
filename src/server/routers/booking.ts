@@ -179,4 +179,41 @@ export const bookingRouter = router({
         },
       });
     }),
+  // Бронирования моего ресторана (для Dashboard владельца)
+  myRestaurantBookings: protectedProcedure
+    .input(
+      z.object({
+        date: z.string().optional(),
+        status: z.string().optional(),
+        limit: z.number().min(1).max(100).default(50),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.prisma) return { bookings: [], total: 0, restaurant: null };
+
+      // Находим ресторан текущего пользователя
+      const restaurant = await ctx.prisma.restaurant.findFirst({
+        where: { ownerId: ctx.user.id! },
+        select: { id: true, name: true, slug: true, city: true },
+      });
+      if (!restaurant) return { bookings: [], total: 0, restaurant: null };
+
+      const where: Record<string, unknown> = { restaurantId: restaurant.id };
+      if (input?.date) where.date = new Date(input.date);
+      if (input?.status) where.status = input.status;
+
+      const [bookings, total] = await Promise.all([
+        ctx.prisma.reservation.findMany({
+          where,
+          take: input?.limit ?? 50,
+          orderBy: [{ date: "desc" }, { time: "asc" }],
+          include: {
+            user: { select: { name: true, phone: true, email: true } },
+            table: { select: { label: true, tableType: true } },
+          },
+        }),
+        ctx.prisma.reservation.count({ where }),
+      ]);
+      return { bookings, total, restaurant };
+    }),
 });

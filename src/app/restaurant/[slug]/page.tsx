@@ -13,7 +13,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
 import { FloorPlan } from "@/components/FloorPlan";
 import { useTRPC } from "@/lib/trpc";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const CUISINE_LABELS: Record<string, string> = {
   RUSSIAN: "Русская", ITALIAN: "Итальянская", JAPANESE: "Японская",
@@ -50,7 +50,12 @@ type BookingStep = "select" | "confirm" | "success";
 export default function RestaurantPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const restaurant = MOCK_RESTAURANTS.find((r) => r.slug === slug);
+
+  // Live data из PostgreSQL, fallback на mock
+  const trpc = useTRPC();
+  const restaurantQuery = useQuery(trpc.restaurant.getBySlug.queryOptions({ slug }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const restaurant: any = restaurantQuery.data ?? MOCK_RESTAURANTS.find((r) => r.slug === slug) ?? null;
 
   const [guestCount, setGuestCount] = useState(2);
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -67,7 +72,7 @@ export default function RestaurantPage() {
   const [bookingError, setBookingError] = useState("");
   const [bookingId, setBookingId] = useState("");
 
-  const trpc = useTRPC();
+
   const createBooking = useMutation(
     trpc.booking.create.mutationOptions({
       onSuccess: (data) => {
@@ -89,6 +94,17 @@ export default function RestaurantPage() {
   const depositAmount = restaurant?.depositRequired
     ? (restaurant.depositAmount || 0) * (selectedSlot?.isPeak ? 1.5 : 1)
     : 0;
+
+  if (restaurantQuery.isLoading) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 40, height: 40, border: "3px solid var(--color-border)", borderTopColor: "var(--color-primary)", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+          <p style={{ color: "var(--color-text-muted)" }}>Загрузка ресторана...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!restaurant) {
     return (
@@ -156,7 +172,7 @@ export default function RestaurantPage() {
             {/* Info */}
             <div className="animate-slide-up">
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                {restaurant.cuisine.map((c) => (
+                {(restaurant.cuisine || []).map((c: string) => (
                   <span key={c} className="badge badge-gold">{CUISINE_LABELS[c] || c}</span>
                 ))}
               </div>
@@ -184,7 +200,7 @@ export default function RestaurantPage() {
 
               {/* Features */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 32 }}>
-                {restaurant.features.map((f) => {
+                {(restaurant.features || []).map((f: string) => {
                   const feat = FEATURE_ICONS[f];
                   if (!feat) return null;
                   const Icon = feat.icon;
@@ -214,7 +230,7 @@ export default function RestaurantPage() {
                   <span style={{ fontSize: 12, color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
                     <Wine size={12} /> Столов
                   </span>
-                  <span style={{ fontWeight: 400 }}>{restaurant.tables.length}</span>
+                  <span style={{ fontWeight: 400 }}>{(restaurant.tables || []).length}</span>
                 </div>
               </div>
 
