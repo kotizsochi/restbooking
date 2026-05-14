@@ -43,7 +43,7 @@ function DashHeader({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab:
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", height: 56 }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <div style={{ width: 32, height: 32, borderRadius: "var(--radius-sm)", background: "var(--color-primary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 500, color: "#fff" }}>R</div>
-          <span style={{ fontSize: 15, fontWeight: 500, color: "var(--color-text-primary)", letterSpacing: 1 }}>RESTBOOKING</span>
+          <span style={{ fontSize: 15, fontWeight: 500, color: "var(--color-text-primary)", letterSpacing: 1 }}>RESTO<span style={{ color: "var(--color-primary)" }}>booking</span></span>
         </Link>
         <nav style={{ display: "flex", gap: 0 }}>
           {tabs.map((t) => (
