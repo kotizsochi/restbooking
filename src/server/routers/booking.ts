@@ -8,14 +8,14 @@ export const bookingRouter = router({
     .input(
       z.object({
         restaurantId: z.string(),
-        date: z.string(), // "2026-05-14"
-        time: z.string(), // "19:00"
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format"),
+        time: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format"),
         guestCount: z.number().min(1).max(20),
-        guestName: z.string().min(2),
-        guestPhone: z.string().min(10),
+        guestName: z.string().min(2).max(100),
+        guestPhone: z.string().regex(/^\+?[0-9]{10,15}$/, "Invalid phone"),
         guestEmail: z.string().email().optional(),
         tableId: z.string().optional(),
-        specialRequests: z.string().optional(),
+        specialRequests: z.string().max(500).optional(),
         source: z
           .enum([
             "PLATFORM_WEB",
@@ -28,6 +28,19 @@ export const bookingRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // SEC-12: Запрет бронирования в прошлом
+      const bookingDate = new Date(input.date + "T00:00:00");
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (bookingDate < today) {
+        throw new Error("Cannot book in the past");
+      }
+
+      // SEC-09: Sanitize specialRequests
+      const sanitizedRequests = input.specialRequests
+        ? input.specialRequests.replace(/<[^>]*>/g, "").trim()
+        : null;
+
       if (!ctx.prisma) {
         // Demo-режим: возвращаем mock-бронирование
         return {
@@ -79,7 +92,7 @@ export const bookingRouter = router({
           date: new Date(input.date),
           time: input.time,
           guestCount: input.guestCount,
-          specialRequests: input.specialRequests || null,
+          specialRequests: sanitizedRequests,
           source: input.source,
           status: "PENDING",
         },
@@ -155,6 +168,16 @@ export const bookingRouter = router({
       if (!ctx.prisma) {
         return { id: input.bookingId, status: input.status };
       }
+
+      // SEC-06: IDOR protection - проверяем принадлежность
+      const reservation = await ctx.prisma.reservation.findUnique({
+        where: { id: input.bookingId },
+        include: { restaurant: { select: { ownerId: true } } },
+      });
+      if (!reservation || reservation.restaurant.ownerId !== ctx.user.id) {
+        throw new Error("Booking not found or access denied");
+      }
+
       const data: Record<string, unknown> = { status: input.status };
       if (input.status === "CONFIRMED") data.confirmedAt = new Date();
       if (input.status === "CANCELLED") {

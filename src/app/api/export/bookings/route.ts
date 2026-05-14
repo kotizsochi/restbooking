@@ -35,6 +35,7 @@ export async function GET(req: Request) {
 
   const bookings = await prisma.reservation.findMany({
     where,
+    take: 10000, // SEC-13: Limit to prevent OOM
     orderBy: [{ date: "desc" }, { time: "asc" }],
     include: {
       user: { select: { name: true, phone: true, email: true } },

@@ -2,23 +2,18 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
+import bcrypt from "bcryptjs";
 
-// Хэширование пароля (bcrypt-free для Vercel Edge)
+// bcryptjs - безопасное хэширование (10 rounds)
 async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  return bcrypt.hash(password, 10);
 }
 
 async function verifyPassword(
   password: string,
   hash: string
 ): Promise<boolean> {
-  const passwordHash = await hashPassword(password);
-  return passwordHash === hash;
+  return bcrypt.compare(password, hash);
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -40,21 +35,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        if (!prisma) {
-          // Demo-режим без БД
+
+        // Demo-режим: только если явно включён через env
+        if (!prisma && process.env.DEMO_MODE === "true") {
+          const demoEmail = process.env.DEMO_EMAIL || "admin@restobooking.ru";
+          const demoPass = process.env.DEMO_PASSWORD || "demo2026";
           if (
-            credentials.email === "admin@restobooking.ru" &&
-            credentials.password === "demo2026"
+            credentials.email === demoEmail &&
+            credentials.password === demoPass
           ) {
             return {
               id: "demo-admin",
-              name: "Денис",
-              email: "admin@restobooking.ru",
+              name: "Demo Admin",
+              email: demoEmail,
               role: "RESTAURANT_ADMIN",
             };
           }
           return null;
         }
+
+        if (!prisma) return null;
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
         });

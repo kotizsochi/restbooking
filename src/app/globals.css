@@ -624,3 +624,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-xs);
 }
 
+/* Spinner animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

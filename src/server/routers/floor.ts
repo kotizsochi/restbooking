@@ -60,14 +60,21 @@ export const floorRouter = router({
         };
       }
 
-      const hall = await ctx.prisma.hall.findUnique({ where: { id: hallId } });
+      const hall = await ctx.prisma.hall.findUnique({
+        where: { id: hallId },
+        include: { restaurant: { select: { ownerId: true } } },
+      });
+      // SEC-08: IDOR protection
+      if (!hall || hall.restaurant.ownerId !== ctx.session?.user?.id) {
+        return { hallId: null, hallName: null, tables: [] };
+      }
       const tables = await ctx.prisma.table.findMany({
         where: { hallId },
         orderBy: { sortOrder: "asc" },
       });
       return {
         hallId,
-        hallName: hall?.name || "Зал",
+        hallName: hall.name,
         tables: tables.map((t) => ({
           id: t.id,
           label: t.label,
@@ -101,8 +108,15 @@ export const floorRouter = router({
 
       // Удаляем все текущие столы и создаём заново (проще и надёжнее)
       const db = ctx.prisma;
-      const hall = await db.hall.findUnique({ where: { id: input.hallId } });
+      const hall = await db.hall.findUnique({
+        where: { id: input.hallId },
+        include: { restaurant: { select: { ownerId: true } } },
+      });
       if (!hall) throw new Error("Зал не найден");
+      // SEC-07: IDOR protection
+      if (hall.restaurant.ownerId !== ctx.session?.user?.id) {
+        throw new Error("Нет доступа к этому залу");
+      }
       await db.table.deleteMany({ where: { hallId: input.hallId } });
 
       const created = await Promise.all(

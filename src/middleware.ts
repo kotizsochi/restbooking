@@ -1,8 +1,56 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// In-memory rate limiter (подходит для single-instance и Beget VPS)
+// На Vercel serverless - каждый cold start обнуляет, но всё равно защищает от burst
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(key: string, maxRequests: number, windowMs: number): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
+    return false;
+  }
+  entry.count++;
+  return entry.count > maxRequests;
+}
+
+// Очистка устаревших записей (каждые 60 сек)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of rateLimitMap) {
+    if (now > val.resetAt) rateLimitMap.delete(key);
+  }
+}, 60_000);
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+  // Rate limiting для API
+  if (pathname.startsWith("/api/")) {
+    const isAuth = pathname.includes("/auth/");
+    const limit = isAuth ? 5 : 30; // 5/min для auth, 30/min для остальных
+    const window = 60_000;
+
+    if (isRateLimited(`${ip}:${isAuth ? "auth" : "api"}`, limit, window)) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429, headers: { "Retry-After": "60" } }
+      );
+    }
+  }
+
+  // Rate limiting для tRPC booking.create (отдельный лимит)
+  if (pathname.startsWith("/api/trpc/booking.create")) {
+    if (isRateLimited(`${ip}:booking`, 10, 60_000)) {
+      return NextResponse.json(
+        { error: "Too many bookings" },
+        { status: 429 }
+      );
+    }
+  }
 
   // Защищённые маршруты
   const protectedPaths = ["/dashboard"];
@@ -28,5 +76,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/login", "/api/:path*"],
 };
