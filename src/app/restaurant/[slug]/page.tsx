@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft, Star, MapPin, Clock, Users, Calendar,
   Phone, Globe, Wine, ChevronDown, Check, AlertCircle,
@@ -165,8 +166,12 @@ export default function RestaurantPage() {
               height: 320, borderRadius: "var(--radius-lg)", overflow: "hidden",
               position: "relative", marginBottom: 32,
             }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={restaurant.coverImage} alt={restaurant.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              {restaurant.coverImage && (
+                <Image src={restaurant.coverImage} alt={restaurant.name} fill
+                  sizes="(max-width: 768px) 100vw, 900px"
+                  style={{ objectFit: "cover" }} priority
+                />
+              )}
             </div>
 
             {/* Info */}

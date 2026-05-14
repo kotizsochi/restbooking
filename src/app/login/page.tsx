@@ -227,6 +227,14 @@ export default function LoginPage() {
             </button>
           </form>
 
+          <div style={{ textAlign: "right", marginTop: 8 }}>
+            <button type="button" onClick={() => alert("Функция восстановления пароля будет доступна в ближайшем обновлении. Обратитесь в поддержку: support@restobooking.ru")} style={{
+              fontSize: 12, color: "var(--color-primary)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: 0,
+            }}>
+              Забыли пароль?
+            </button>
+          </div>
+
           {/* Demo credentials */}
           <div
             style={{

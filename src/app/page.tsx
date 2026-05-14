@@ -10,6 +10,7 @@ import {
 import { MOCK_RESTAURANTS } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useTRPC } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
@@ -296,14 +297,12 @@ function RestaurantCard({ restaurant }: { restaurant: any }) {
           height: "clamp(140px, 20vw, 200px)",
           position: "relative", overflow: "hidden",
         }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={restaurant.coverImage} alt={restaurant.name} loading="lazy" style={{
-            width: "100%", height: "100%", objectFit: "cover",
-            transition: "transform 0.3s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
-          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          />
+          {restaurant.coverImage && (
+            <Image src={restaurant.coverImage} alt={restaurant.name} fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: "cover", transition: "transform 0.3s ease" }}
+            />
+          )}
           {restaurant.depositRequired && (
             <span className="badge badge-gold" style={{ position: "absolute", top: 12, right: 12 }}>Депозит</span>
           )}
