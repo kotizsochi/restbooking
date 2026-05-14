@@ -134,23 +134,6 @@ export const bookingRouter = router({
       return { success: true };
     }),
 
-  // Обновить статус бронирования (админ)
-  updateStatus: adminProcedure
-    .input(
-      z.object({
-        bookingId: z.string(),
-        status: z.enum(["PENDING", "CONFIRMED", "SEATED", "COMPLETED", "CANCELLED", "NO_SHOW"]),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (!ctx.prisma) throw new Error("Database not available");
-      const booking = await ctx.prisma.reservation.update({
-        where: { id: input.bookingId },
-        data: { status: input.status },
-      });
-      return booking;
-    }),
-
   // Получить бронирования ресторана (админ)
   listByRestaurant: adminProcedure
     .input(
