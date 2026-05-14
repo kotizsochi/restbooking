@@ -477,11 +477,14 @@ export default function HomePage() {
 
   // Live data из PostgreSQL через tRPC
   const trpc = useTRPC();
-  const liveQuery = useQuery(trpc.restaurant.list.queryOptions({
-    city: filteredCity !== "Все города" ? filteredCity : undefined,
-    cuisine: cuisineFilter.length === 1 ? cuisineFilter[0] : undefined,
-    limit: 50,
-  }));
+  const liveQuery = useQuery({
+    ...trpc.restaurant.list.queryOptions({
+      city: filteredCity !== "Все города" ? filteredCity : undefined,
+      cuisine: cuisineFilter.length === 1 ? cuisineFilter[0] : undefined,
+      limit: 50,
+    }),
+    staleTime: 5 * 60 * 1000, // PERF-02: 5 мин кэш
+  });
 
   const restaurants = useMemo(() => {
     // Приоритет: live данные из БД, fallback на mock
@@ -494,6 +497,21 @@ export default function HomePage() {
       return true;
     });
   }, [filteredCity, cuisineFilter, priceFilter, ratingFilter, liveQuery.data]);
+
+  // UX-01: Skeleton cards
+  const SkeletonCard = () => (
+    <div style={{
+      background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)",
+      overflow: "hidden", boxShadow: "var(--shadow-sm)",
+    }}>
+      <div style={{ height: 180, background: "var(--color-bg-elevated)", animation: "pulse 1.5s ease-in-out infinite" }} />
+      <div style={{ padding: 16 }}>
+        <div style={{ height: 20, width: "70%", background: "var(--color-bg-elevated)", borderRadius: 4, marginBottom: 8, animation: "pulse 1.5s ease-in-out infinite" }} />
+        <div style={{ height: 14, width: "50%", background: "var(--color-bg-elevated)", borderRadius: 4, marginBottom: 12, animation: "pulse 1.5s ease-in-out infinite" }} />
+        <div style={{ height: 14, width: "90%", background: "var(--color-bg-elevated)", borderRadius: 4, animation: "pulse 1.5s ease-in-out infinite" }} />
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -529,7 +547,11 @@ export default function HomePage() {
             gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))",
             gap: "clamp(16px, 2vw, 24px)",
           }}>
-            {restaurants.map((r) => <RestaurantCard key={r.id} restaurant={r} />)}
+            {liveQuery.isLoading && !liveQuery.data ? (
+              Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={`sk-${i}`} />)
+            ) : (
+              restaurants.map((r) => <RestaurantCard key={r.id} restaurant={r} />)
+            )}
           </div>
           {restaurants.length === 0 && (
             <div style={{ textAlign: "center", padding: 60, color: "var(--color-text-muted)" }}>
