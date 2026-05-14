@@ -86,10 +86,29 @@ export default function RestaurantPage() {
     })
   );
 
+  // UX-08: Получаем занятые слоты из БД
+  const occupiedQuery = useQuery(
+    trpc.booking.getOccupiedSlots.queryOptions(
+      { restaurantId: restaurant?.id || "", date: selectedDate },
+      { enabled: !!restaurant?.id }
+    )
+  );
+  const occupiedSlots = occupiedQuery.data?.occupied || [];
+
   const availableSlots = useMemo(() => {
     if (!restaurant) return [];
-    return getAvailableSlots(restaurant.id, selectedDate, guestCount);
-  }, [restaurant, selectedDate, guestCount]);
+    const slots = getAvailableSlots(restaurant.id, selectedDate, guestCount);
+    // Помечаем слоты с максимальной загрузкой (все столы заняты)
+    return slots.map(slot => {
+      const occupiedTablesAtTime = occupiedSlots
+        .filter(o => o.time === slot.time)
+        .map(o => o.tableId);
+      const freeTablesCount = slot.tables.filter(
+        t => !occupiedTablesAtTime.includes(t.id)
+      ).length;
+      return { ...slot, freeTablesCount, fullyBooked: freeTablesCount === 0 };
+    });
+  }, [restaurant, selectedDate, guestCount, occupiedSlots]);
 
   const selectedSlot = availableSlots.find((s) => s.time === selectedTime);
   const depositAmount = restaurant?.depositRequired

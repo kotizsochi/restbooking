@@ -250,4 +250,25 @@ export const bookingRouter = router({
       ]);
       return { bookings, total, restaurant };
     }),
+
+  // UX-08: Получить занятые слоты для даты/ресторана (публичный)
+  getOccupiedSlots: publicProcedure
+    .input(
+      z.object({
+        restaurantId: z.string(),
+        date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.prisma) return { occupied: [] };
+      const reservations = await ctx.prisma.reservation.findMany({
+        where: {
+          restaurantId: input.restaurantId,
+          date: input.date,
+          status: { in: ["PENDING", "CONFIRMED", "SEATED"] },
+        },
+        select: { time: true, tableId: true },
+      });
+      return { occupied: reservations };
+    }),
 });
