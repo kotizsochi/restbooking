@@ -402,6 +402,51 @@ function StatsTab() {
 
 interface EditorTable { id: string; label: string; x: number; y: number; type: string; seats: number; shape: "circle" | "rect" }
 
+function NotificationsList() {
+  const trpc = useTRPC();
+  const settingsQuery = useQuery(trpc.notification.getSettings.queryOptions());
+  const toggleMut = useMutation(trpc.notification.toggleChannel.mutationOptions({
+    onSuccess: () => settingsQuery.refetch(),
+  }));
+
+  const channels = settingsQuery.data?.channels || [
+    { key: "sms_new_booking", label: "SMS о новом бронировании", desc: "Гость получит SMS с подтверждением", enabled: true, channel: "sms" as const },
+    { key: "tg_new_booking", label: "Telegram уведомление", desc: "Мгновенное оповещение бота в чат ресторана", enabled: true, channel: "telegram" as const },
+    { key: "sms_reminder", label: "Напоминание за 2 часа", desc: "Напомнить гостю о бронировании", enabled: false, channel: "sms" as const },
+    { key: "email_review", label: "Запрос отзыва", desc: "На следующий день после визита", enabled: false, channel: "email" as const },
+    { key: "email_confirm", label: "Email подтверждение", desc: "Дублировать подтверждение на почту", enabled: false, channel: "email" as const },
+  ];
+
+  return (
+    <>
+      {channels.map((n, i) => (
+        <div key={n.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: i < channels.length - 1 ? "1px solid var(--color-border)" : "none" }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 400 }}>{n.label}</div>
+            <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{n.desc}</div>
+          </div>
+          <div
+            onClick={() => toggleMut.mutate({ key: n.key, enabled: !n.enabled })}
+            style={{
+              width: 44, height: 24, borderRadius: 12,
+              background: n.enabled ? "var(--color-primary)" : "var(--color-bg-elevated)",
+              cursor: toggleMut.isPending ? "wait" : "pointer",
+              position: "relative", transition: "background 0.2s",
+              opacity: toggleMut.isPending ? 0.6 : 1,
+            }}
+          >
+            <div style={{
+              width: 20, height: 20, borderRadius: "50%", background: "#fff",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+              position: "absolute", top: 2, left: n.enabled ? 22 : 2, transition: "left 0.2s",
+            }} />
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
 function SettingsTab() {
   const [section, setSection] = useState<"floor" | "widget" | "notifications">("floor");
   const trpc = useTRPC();
@@ -682,30 +727,18 @@ function SettingsTab() {
           </>
         )}
 
-        {section === "notifications" && (
-          <>
-            <h2 style={{ fontSize: 22, fontWeight: 500, marginBottom: 20 }}>Уведомления</h2>
-            <div style={{ background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)", padding: 24, boxShadow: "var(--shadow-sm)", maxWidth: 600 }}>
-              {[
-                { label: "SMS о новом бронировании", desc: "Гость получит SMS с подтверждением", enabled: true },
-                { label: "Telegram уведомление", desc: "Мгновенное оповещение бота в чат ресторана", enabled: true },
-                { label: "Напоминание за 2 часа", desc: "Напомнить гостю о бронировании", enabled: false },
-                { label: "Запрос отзыва", desc: "На следующий день после визита", enabled: false },
-                { label: "Email подтверждение", desc: "Дублировать подтверждение на почту", enabled: false },
-              ].map((n, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: i < 4 ? "1px solid var(--color-border)" : "none" }}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 400 }}>{n.label}</div>
-                    <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{n.desc}</div>
-                  </div>
-                  <div style={{ width: 44, height: 24, borderRadius: 12, background: n.enabled ? "var(--color-primary)" : "var(--color-bg-elevated)", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
-                    <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)", position: "absolute", top: 2, left: n.enabled ? 22 : 2, transition: "left 0.2s" }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        {section === "notifications" && (() => {
+          const notifQuery = layoutQuery; // Реиспользуем для статуса загрузки
+          void notifQuery; // suppress unused
+          return (
+            <>
+              <h2 style={{ fontSize: 22, fontWeight: 500, marginBottom: 20 }}>Уведомления</h2>
+              <div style={{ background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)", padding: 24, boxShadow: "var(--shadow-sm)", maxWidth: 600 }}>
+                <NotificationsList />
+              </div>
+            </>
+          );
+        })()}
       </main>
     </div>
   );
