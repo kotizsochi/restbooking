@@ -80,8 +80,8 @@ function RegistrationForm() {
         <p style={{ fontSize: 14, color: "var(--color-text-secondary)", marginBottom: 24 }}>Рекомендуем регистрировать аккаунт на владельца или официальный email заведения</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div><label className="input-label">Ваше имя *</label><input className="input-field" placeholder="Иван Иванов" value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} /></div>
-          <div><label className="input-label">E-mail *</label><input className="input-field" type="email" placeholder="info@restaurant.ru" value={form.email} onChange={(e) => update("email", e.target.value)} /></div>
-          <div><label className="input-label">Пароль *</label><input className="input-field" type="password" placeholder="Минимум 8 символов" value={form.password} onChange={(e) => update("password", e.target.value)} /></div>
+          <div><label className="input-label">E-mail *</label><input className="input-field" type="email" placeholder="info@restaurant.ru" value={form.email} onChange={(e) => update("email", e.target.value)} autoComplete="off" /></div>
+          <div><label className="input-label">Пароль *</label><input className="input-field" type="password" placeholder="Минимум 8 символов" value={form.password} onChange={(e) => update("password", e.target.value)} autoComplete="new-password" /></div>
           <div><label className="input-label">Телефон *</label><PhoneMaskedInput value={form.phone} onChange={(v) => update("phone", v)} /></div>
         </div>
         <label style={{ display: "flex", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer", marginTop: 16, alignItems: "flex-start" }}>
