@@ -118,4 +118,100 @@ export const restaurantRouter = router({
       });
       return { favorited: true };
     }),
+
+  // Регистрация нового ресторана (публичная форма)
+  register: publicProcedure
+    .input(
+      z.object({
+        ownerName: z.string().min(2).max(100),
+        email: z.string().email(),
+        password: z.string().min(8).max(100),
+        phone: z.string().min(10).max(20),
+        restaurantName: z.string().min(2).max(100),
+        city: z.string().min(2).max(50),
+        address: z.string().min(5).max(200),
+        restaurantPhone: z.string().min(10).max(20),
+        tableCount: z.number().min(1).max(200).default(10),
+        schedule: z.array(z.object({
+          enabled: z.boolean(),
+          open: z.string(),
+          close: z.string(),
+        })).length(7),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.prisma) {
+        // Demo: просто возвращаем success
+        return { success: true, restaurantId: "demo", slug: "demo-restaurant" };
+      }
+
+      const bcrypt = await import("bcryptjs");
+      const slug = input.restaurantName
+        .toLowerCase()
+        .replace(/[^a-zа-яё0-9\s]/gi, "")
+        .replace(/\s+/g, "-")
+        .substring(0, 50);
+
+      // Проверка дубликата email
+      const existingUser = await ctx.prisma.user.findUnique({ where: { email: input.email } });
+      if (existingUser) {
+        throw new Error("Пользователь с таким email уже существует");
+      }
+
+      const passwordHash = await bcrypt.hash(input.password, 10);
+
+      // Транзакция: user + restaurant + hall + tables
+      const result = await ctx.prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            name: input.ownerName,
+            email: input.email,
+            phone: input.phone,
+            passwordHash,
+            role: "RESTAURANT_ADMIN",
+          },
+        });
+
+        // Расписание: берём первый enabled день
+        const firstEnabled = input.schedule.find(s => s.enabled) || { open: "10:00", close: "23:00" };
+
+        const restaurant = await tx.restaurant.create({
+          data: {
+            name: input.restaurantName,
+            slug: slug + "-" + Date.now().toString(36),
+            city: input.city,
+            address: input.address,
+            phone: input.restaurantPhone,
+            openingTime: firstEnabled.open,
+            closingTime: firstEnabled.close,
+            ownerId: user.id,
+            isActive: true,
+          },
+        });
+
+        const hall = await tx.hall.create({
+          data: {
+            name: "Основной зал",
+            restaurantId: restaurant.id,
+          },
+        });
+
+        // Создаём столы
+        const tableData = Array.from({ length: input.tableCount }, (_, i) => ({
+          hallId: hall.id,
+          restaurantId: restaurant.id,
+          label: String(i + 1),
+          tableType: "STANDARD" as const,
+          minCapacity: 2,
+          maxCapacity: 4,
+          posX: (i % 5) * 100 + 50,
+          posY: Math.floor(i / 5) * 100 + 50,
+        }));
+        await tx.table.createMany({ data: tableData });
+
+        return { restaurantId: restaurant.id, slug: restaurant.slug };
+      });
+
+      return { success: true, ...result };
+    }),
 });

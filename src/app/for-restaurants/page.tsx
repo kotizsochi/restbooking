@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTRPC } from "@/lib/trpc";
+import { useMutation } from "@tanstack/react-query";
 import {
   BookOpen, Bell, CreditCard, Smartphone, Plug,
   ArrowRight, ArrowLeft, CheckCircle2, Globe,
@@ -35,6 +37,14 @@ interface DaySchedule { enabled: boolean; open: string; close: string; }
 
 function RegistrationForm() {
   const [step, setStep] = useState<RegStep>(1);
+  const [regError, setRegError] = useState("");
+  const trpc = useTRPC();
+  const registerMut = useMutation(
+    trpc.restaurant.register.mutationOptions({
+      onSuccess: () => { setRegError(""); setStep(5); },
+      onError: (err) => setRegError(err.message || "Ошибка регистрации"),
+    })
+  );
   const [form, setForm] = useState({
     ownerName: "", email: "", password: "", phone: "",
     restaurantName: "", city: "", address: "", restaurantPhone: "",
@@ -154,8 +164,23 @@ function RegistrationForm() {
         </div>
         <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
           <button className="btn btn-secondary" style={{ flex: 1, gap: 6 }} onClick={() => setStep(3)}><ArrowLeft size={14} /> Назад</button>
-          <button className="btn btn-primary" style={{ flex: 2, gap: 6 }} disabled={!form.tableCount} onClick={() => setStep(5)}>Создать заведение <ArrowRight size={14} /></button>
+          <button className="btn btn-primary" style={{ flex: 2, gap: 6 }} disabled={!form.tableCount || registerMut.isPending} onClick={() => {
+            setRegError("");
+            registerMut.mutate({
+              ownerName: form.ownerName,
+              email: form.email,
+              password: form.password,
+              phone: form.phone,
+              restaurantName: form.restaurantName,
+              city: form.city,
+              address: form.address,
+              restaurantPhone: form.restaurantPhone,
+              tableCount: parseInt(form.tableCount) || 10,
+              schedule,
+            });
+          }}>{registerMut.isPending ? "Создание..." : "Создать заведение"} <ArrowRight size={14} /></button>
         </div>
+        {regError && <p style={{ color: "var(--color-error)", fontSize: 13, marginTop: 8, textAlign: "center" }}>{regError}</p>}
       </>)}
 
       {/* Step 5: Success + Trial */}

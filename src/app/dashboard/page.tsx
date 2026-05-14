@@ -806,6 +806,18 @@ function SettingsTab() {
                   <button style={{ width: "100%", padding: "10px", background: widgetColor, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>{widgetBtnText}</button>
                   <div style={{ fontSize: 9, color: widgetTheme === "dark" ? "#555" : "#bbb", textAlign: "center", marginTop: 8 }}>RESTObooking</div>
                 </div>
+                {/* QR-код для быстрого доступа */}
+                <div style={{ marginTop: 16, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 8 }}>QR-КОД ДЛЯ ГОСТЕЙ</div>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://restobooking.ru/widget/${restaurantSlug}`)}`}
+                    alt="QR-код виджета"
+                    width={120}
+                    height={120}
+                    style={{ borderRadius: 8, background: "#fff", padding: 4 }}
+                  />
+                  <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 6 }}>Распечатайте и разместите на столах</p>
+                </div>
               </div>
             </div>
           </>
