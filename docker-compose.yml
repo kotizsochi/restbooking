@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://restbooking:${DB_PASSWORD}@db:5432/restbooking
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_URL=${AUTH_URL:-http://localhost:3000}
+      - DEMO_MODE=${DEMO_MODE:-false}
+      - NEXT_PUBLIC_YM_ID=${NEXT_PUBLIC_YM_ID:-}
+      - NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: restbooking
+      POSTGRES_USER: restbooking
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U restbooking"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
