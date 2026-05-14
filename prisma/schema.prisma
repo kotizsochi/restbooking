@@ -161,6 +161,9 @@ model Restaurant {
   crmConfig      Json?
   crmExternalId  String?
 
+  notificationSettings Json?
+  widgetSettings       Json?
+
   isActive    Boolean     @default(true)
   isVerified  Boolean     @default(false)
   createdAt   DateTime    @default(now())
