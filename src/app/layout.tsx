@@ -77,6 +77,33 @@ export default function RootLayout({
             `}} />
           </>
         )}
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "RESTObooking",
+              "url": "https://restobooking.ru",
+              "description": "Сервис бронирования столиков в ресторанах. Электронная книга резервов, онлайн прием броней, депозиты.",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Web",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "RUB",
+                "description": "Бесплатный тариф до 300 заявок в месяц"
+              },
+              "creator": {
+                "@type": "Organization",
+                "name": "RESTObooking",
+                "url": "https://restobooking.ru"
+              }
+            }),
+          }}
+        />
       </head>
       <body>
         <div className="gradient-bg" />
