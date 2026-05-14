@@ -122,21 +122,21 @@ function HeroSection({ onSearch }: { onSearch: (city: string) => void }) {
           display: "flex", gap: 12, padding: "clamp(12px, 2vw, 16px)",
           maxWidth: 720, margin: "0 auto", flexWrap: "wrap", animationDelay: "0.2s",
           background: "rgba(255,255,255,0.12)", backdropFilter: "blur(16px)",
-          border: "1px solid rgba(255,255,255,0.15)",
+          border: "none",
         }}>
           <div style={{ flex: "1 1 130px", minWidth: 120 }}>
             <label className="input-label" style={{ color: "rgba(255,255,255,0.7)" }}><MapPin size={11} style={{ display: "inline", marginRight: 4 }} />Город</label>
-            <select className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} value={city} onChange={(e) => { setCity(e.target.value); onSearch(e.target.value); }}>
+            <select className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "none" }} value={city} onChange={(e) => { setCity(e.target.value); onSearch(e.target.value); }}>
               {CITIES.map((c) => <option key={c} value={c} style={{ color: "#000" }}>{c}</option>)}
             </select>
           </div>
           <div style={{ flex: "1 1 130px", minWidth: 120 }}>
             <label className="input-label" style={{ color: "rgba(255,255,255,0.7)" }}><Calendar size={11} style={{ display: "inline", marginRight: 4 }} />Дата</label>
-            <input type="date" className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split("T")[0]} />
+            <input type="date" className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "none" }} value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split("T")[0]} />
           </div>
           <div style={{ flex: "1 1 100px", minWidth: 90 }}>
             <label className="input-label" style={{ color: "rgba(255,255,255,0.7)" }}><Users size={11} style={{ display: "inline", marginRight: 4 }} />Гости</label>
-            <select className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
+            <select className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "none" }} value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
               {GUEST_OPTIONS.map((g) => <option key={g} value={g} style={{ color: "#000" }}>{g} {g === 1 ? "гость" : g < 5 ? "гостя" : "гостей"}</option>)}
             </select>
           </div>
