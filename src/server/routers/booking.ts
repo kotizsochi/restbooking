@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure, protectedProcedure, adminProcedure } from "../trpc";
+import { sendBookingNotification } from "@/lib/telegram";
 
 export const bookingRouter = router({
   // Создать бронирование (публичный - гость может бронировать без регистрации)
@@ -87,6 +88,16 @@ export const bookingRouter = router({
           table: { select: { label: true } },
         },
       });
+
+      // Telegram уведомление (fire-and-forget)
+      sendBookingNotification(input.restaurantId, {
+        guestName: input.guestName,
+        guestCount: input.guestCount,
+        date: input.date,
+        time: input.time,
+        tableName: reservation.table?.label || undefined,
+        specialRequests: input.specialRequests || undefined,
+      }).catch(() => {});
 
       return reservation;
     }),
