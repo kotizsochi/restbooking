@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SessionProvider } from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "RESTObooking - Бронирование ресторанов онлайн",
@@ -66,7 +67,9 @@ export default function RootLayout({
       </head>
       <body>
         <div className="gradient-bg" />
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import {
   Building, CreditCard, Users, BarChart3, Settings, Plus,
   Search, ChevronRight, Clock, CheckCircle2, XCircle, Eye,
@@ -31,7 +32,7 @@ const STAFF = [
   { name: "Денис", email: "admin@restobooking.ru", role: "Создатель", registered: "14.05.2026" },
 ];
 
-function DashHeader({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab: (t: Tab) => void }) {
+function DashHeader({ activeTab, setActiveTab, userName }: { activeTab: Tab; setActiveTab: (t: Tab) => void; userName: string }) {
   const tabs: { key: Tab; label: string }[] = [
     { key: "venues", label: "Заведения" },
     { key: "tariffs", label: "Тарифы и оплата" },
@@ -58,7 +59,11 @@ function DashHeader({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab:
         </nav>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <ThemeToggle />
-          <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Денис</span>
+          <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>{userName}</span>
+          <button onClick={() => signOut({ callbackUrl: "/login" })} style={{
+            fontSize: 12, color: "var(--color-text-muted)", background: "none", border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-sm)", padding: "4px 10px", cursor: "pointer", transition: "all var(--transition-fast)",
+          }}>Выйти</button>
         </div>
       </div>
     </header>
@@ -672,10 +677,12 @@ function SettingsTab() {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>("venues");
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "Пользователь";
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-bg-primary)" }}>
-      <DashHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+      <DashHeader activeTab={activeTab} setActiveTab={setActiveTab} userName={userName} />
       {activeTab === "venues" && <VenuesTab />}
       {activeTab === "tariffs" && <TariffsTab />}
       {activeTab === "staff" && <StaffTab />}

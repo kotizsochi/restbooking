@@ -10,6 +10,7 @@ import {
 import { MOCK_RESTAURANTS } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const CITIES = ["Все города", "Москва", "Санкт-Петербург", "Сочи"];
 const GUEST_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -53,6 +54,7 @@ function RatingStars({ rating }: { rating: number }) {
 }
 
 function Header() {
+  const { data: session } = useSession();
   return (
     <header className="glass-card header-separator" style={{
       position: "sticky", top: 0, zIndex: 50, borderRadius: 0,
@@ -72,7 +74,11 @@ function Header() {
         <nav style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <Link href="/for-restaurants" className="btn btn-ghost btn-sm" style={{ textDecoration: "none" }}>Для ресторанов</Link>
           <ThemeToggle />
-          <Link href="/dashboard" className="btn btn-primary btn-sm" style={{ textDecoration: "none" }}>Войти</Link>
+          {session ? (
+            <Link href="/dashboard" className="btn btn-primary btn-sm" style={{ textDecoration: "none" }}>Личный кабинет</Link>
+          ) : (
+            <Link href="/login" className="btn btn-primary btn-sm" style={{ textDecoration: "none" }}>Войти</Link>
+          )}
         </nav>
       </div>
     </header>
