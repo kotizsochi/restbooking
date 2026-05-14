@@ -6,11 +6,11 @@ import {
   Building, CreditCard, Users, BarChart3, Settings, Plus,
   Search, ChevronRight, Clock, CheckCircle2, XCircle, Eye,
   Phone, Mail, Calendar, MapPin, Star, Bell, ArrowRight,
-  TrendingUp, UserCheck, UserX, Filter,
+  TrendingUp, UserCheck, UserX, Filter, Trash2, Move, LayoutGrid,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-type Tab = "venues" | "tariffs" | "staff" | "stats";
+type Tab = "venues" | "tariffs" | "staff" | "stats" | "settings";
 
 const MOCK_BOOKINGS = [
   { id: 1, guest: "Александр М.", phone: "+7 900 123-45-67", guests: 6, time: "12:00", table: "A-2", status: "new" as const, tags: ["VIP", "День рождения"], comment: "Комментарий гостя до 100 символов" },
@@ -37,6 +37,7 @@ function DashHeader({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab:
     { key: "tariffs", label: "Тарифы и оплата" },
     { key: "staff", label: "Сотрудники" },
     { key: "stats", label: "Статистика" },
+    { key: "settings", label: "Настройки" },
   ];
   return (
     <header style={{ background: "var(--color-bg-card)", boxShadow: "var(--shadow-sm)", position: "sticky", top: 0, zIndex: 50 }}>
@@ -392,6 +393,283 @@ function StatsTab() {
   );
 }
 
+interface EditorTable { id: string; label: string; x: number; y: number; type: string; seats: number; shape: "circle" | "rect" }
+
+function SettingsTab() {
+  const [section, setSection] = useState<"floor" | "widget" | "notifications">("floor");
+  const [tables, setTables] = useState<EditorTable[]>([
+    { id: "t1", label: "1", x: 80, y: 80, type: "STANDARD", seats: 4, shape: "rect" },
+    { id: "t2", label: "2", x: 240, y: 80, type: "STANDARD", seats: 2, shape: "circle" },
+    { id: "t3", label: "VIP", x: 160, y: 200, type: "VIP", seats: 8, shape: "rect" },
+    { id: "t4", label: "3", x: 80, y: 200, type: "STANDARD", seats: 4, shape: "circle" },
+    { id: "t5", label: "Бар", x: 300, y: 200, type: "BAR", seats: 2, shape: "circle" },
+  ]);
+  const [dragging, setDragging] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [selectedEditor, setSelectedEditor] = useState<string | null>(null);
+  const [widgetTheme, setWidgetTheme] = useState("dark");
+  const [widgetColor, setWidgetColor] = useState("#8B6D47");
+  const [widgetBtnText, setWidgetBtnText] = useState("Забронировать");
+
+  const handleSvgMouseDown = (e: React.MouseEvent<SVGElement>, id: string) => {
+    const svg = (e.currentTarget as SVGElement).closest("svg");
+    if (!svg) return;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const svgP = pt.matrixTransform(ctm.inverse());
+    const table = tables.find(t => t.id === id);
+    if (!table) return;
+    setDragging(id);
+    setDragOffset({ x: svgP.x - table.x, y: svgP.y - table.y });
+  };
+
+  const handleSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!dragging) return;
+    const svg = e.currentTarget;
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const svgP = pt.matrixTransform(ctm.inverse());
+    setTables(prev => prev.map(t => t.id === dragging ? { ...t, x: Math.max(30, Math.min(470, svgP.x - dragOffset.x)), y: Math.max(30, Math.min(370, svgP.y - dragOffset.y)) } : t));
+  };
+
+  const addTable = () => {
+    const id = `t${Date.now()}`;
+    setTables(prev => [...prev, { id, label: `${prev.length + 1}`, x: 200, y: 150, type: "STANDARD", seats: 4, shape: "rect" }]);
+  };
+
+  const removeTable = (id: string) => setTables(prev => prev.filter(t => t.id !== id));
+
+  const sections = [
+    { key: "floor" as const, label: "Схема зала", icon: LayoutGrid },
+    { key: "widget" as const, label: "Виджет", icon: Eye },
+    { key: "notifications" as const, label: "Уведомления", icon: Bell },
+  ];
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", minHeight: "calc(100vh - 56px)" }}>
+      <aside style={{ background: "var(--color-bg-card)", padding: 16, boxShadow: "var(--shadow-sm)" }}>
+        {sections.map(s => {
+          const Icon = s.icon;
+          return (
+            <button key={s.key} onClick={() => setSection(s.key)} style={{
+              display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "10px 12px",
+              background: section === s.key ? "rgba(139,109,71,0.08)" : "transparent",
+              border: "none", borderRadius: "var(--radius-sm)", cursor: "pointer",
+              color: section === s.key ? "var(--color-primary)" : "var(--color-text-secondary)",
+              fontSize: 13, fontWeight: section === s.key ? 500 : 400, marginBottom: 4,
+            }}><Icon size={16} /> {s.label}</button>
+          );
+        })}
+      </aside>
+
+      <main style={{ padding: 32 }}>
+        {section === "floor" && (
+          <>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div>
+                <h2 style={{ fontSize: 22, fontWeight: 500 }}>Конструктор зала</h2>
+                <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Перетаскивайте столы для настройки схемы</p>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="btn btn-secondary btn-sm" onClick={addTable} style={{ gap: 4 }}><Plus size={14} /> Добавить стол</button>
+                <button className="btn btn-primary btn-sm">Сохранить</button>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 260px", gap: 20 }}>
+              {/* SVG Canvas */}
+              <div style={{ background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-sm)", overflow: "hidden" }}>
+                <svg viewBox="0 0 500 400" style={{ width: "100%", height: "auto", cursor: dragging ? "grabbing" : "default" }}
+                  onMouseMove={handleSvgMouseMove}
+                  onMouseUp={() => setDragging(null)}
+                  onMouseLeave={() => setDragging(null)}
+                >
+                  <defs>
+                    <pattern id="editor-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--color-border)" strokeWidth="0.5" opacity="0.4" />
+                    </pattern>
+                  </defs>
+                  <rect width="500" height="400" fill="url(#editor-grid)" />
+
+                  {/* Entrance */}
+                  <g transform="translate(220, 380)">
+                    <rect width="60" height="16" rx="3" fill="none" stroke="var(--color-text-muted)" strokeWidth="1" strokeDasharray="4" />
+                    <text x="30" y="12" textAnchor="middle" fill="var(--color-text-muted)" fontSize="9">Вход</text>
+                  </g>
+
+                  {tables.map(t => {
+                    const isSelected = selectedEditor === t.id;
+                    const fill = t.type === "VIP" ? "rgba(200,169,126,0.2)" : "rgba(139,109,71,0.1)";
+                    const stroke = isSelected ? "var(--color-primary)" : "var(--color-border)";
+                    return (
+                      <g key={t.id} transform={`translate(${t.x}, ${t.y})`} style={{ cursor: "grab" }}
+                        onMouseDown={(e) => { handleSvgMouseDown(e, t.id); setSelectedEditor(t.id); }}
+                      >
+                        {t.shape === "rect"
+                          ? <rect x="-28" y="-18" width="56" height="36" rx="4" fill={fill} stroke={stroke} strokeWidth={isSelected ? 2 : 1} />
+                          : <circle cx="0" cy="0" r="22" fill={fill} stroke={stroke} strokeWidth={isSelected ? 2 : 1} />
+                        }
+                        {Array.from({ length: Math.min(t.seats, 8) }).map((_, i) => {
+                          const a = (i / Math.min(t.seats, 8)) * Math.PI * 2 - Math.PI / 2;
+                          return <circle key={i} cx={Math.cos(a) * 36} cy={Math.sin(a) * 36} r="4" fill="var(--color-bg-secondary)" stroke="var(--color-border)" strokeWidth="0.5" />;
+                        })}
+                        <text x="0" y="1" textAnchor="middle" dominantBaseline="middle" fill="var(--color-text-primary)" fontSize="11" fontWeight="500">{t.label}</text>
+                        <text x="0" y="14" textAnchor="middle" fill="var(--color-text-muted)" fontSize="8">{t.seats} мест</text>
+                        {t.type === "VIP" && (
+                          <g transform="translate(18,-16)"><rect x="-10" y="-5" width="20" height="10" rx="3" fill="var(--color-primary)" /><text x="0" y="3" textAnchor="middle" fill="#fff" fontSize="6" fontWeight="600">VIP</text></g>
+                        )}
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+
+              {/* Properties panel */}
+              <div style={{ background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)", padding: 16, boxShadow: "var(--shadow-sm)" }}>
+                <h3 style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>Столы ({tables.length})</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {tables.map(t => (
+                    <div key={t.id} onClick={() => setSelectedEditor(t.id)} style={{
+                      display: "flex", justifyContent: "space-between", alignItems: "center",
+                      padding: "8px 10px", borderRadius: "var(--radius-sm)", cursor: "pointer",
+                      background: selectedEditor === t.id ? "rgba(139,109,71,0.08)" : "transparent",
+                      border: selectedEditor === t.id ? "1px solid var(--color-primary)" : "1px solid var(--color-border)",
+                    }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 500 }}>Стол {t.label}</div>
+                        <div style={{ fontSize: 11, color: "var(--color-text-muted)" }}>{t.type} / {t.seats} мест</div>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); removeTable(t.id); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-error)", padding: 4 }}><Trash2 size={14} /></button>
+                    </div>
+                  ))}
+                </div>
+
+                {selectedEditor && (() => {
+                  const t = tables.find(x => x.id === selectedEditor);
+                  if (!t) return null;
+                  return (
+                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--color-border)" }}>
+                      <div style={{ fontSize: 11, color: "var(--color-text-muted)", marginBottom: 8 }}>РЕДАКТИРОВАНИЕ</div>
+                      <div style={{ marginBottom: 8 }}>
+                        <label style={{ fontSize: 11, color: "var(--color-text-muted)", display: "block", marginBottom: 4 }}>Название</label>
+                        <input className="input-field" value={t.label} onChange={e => setTables(prev => prev.map(x => x.id === t.id ? { ...x, label: e.target.value } : x))} style={{ fontSize: 13 }} />
+                      </div>
+                      <div style={{ marginBottom: 8 }}>
+                        <label style={{ fontSize: 11, color: "var(--color-text-muted)", display: "block", marginBottom: 4 }}>Мест</label>
+                        <input type="number" className="input-field" value={t.seats} min={1} max={20} onChange={e => setTables(prev => prev.map(x => x.id === t.id ? { ...x, seats: Number(e.target.value) } : x))} style={{ fontSize: 13 }} />
+                      </div>
+                      <div style={{ marginBottom: 8 }}>
+                        <label style={{ fontSize: 11, color: "var(--color-text-muted)", display: "block", marginBottom: 4 }}>Тип</label>
+                        <select className="input-field" value={t.type} onChange={e => setTables(prev => prev.map(x => x.id === t.id ? { ...x, type: e.target.value } : x))} style={{ fontSize: 13 }}>
+                          <option value="STANDARD">Стандарт</option>
+                          <option value="VIP">VIP</option>
+                          <option value="BAR">Бар</option>
+                          <option value="OUTDOOR">Терраса</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 11, color: "var(--color-text-muted)", display: "block", marginBottom: 4 }}>Форма</label>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          {(["rect", "circle"] as const).map(s => (
+                            <button key={s} onClick={() => setTables(prev => prev.map(x => x.id === t.id ? { ...x, shape: s } : x))} style={{
+                              flex: 1, padding: "6px", border: `1px solid ${t.shape === s ? "var(--color-primary)" : "var(--color-border)"}`,
+                              borderRadius: "var(--radius-sm)", background: t.shape === s ? "rgba(139,109,71,0.08)" : "transparent",
+                              cursor: "pointer", fontSize: 12, color: "var(--color-text-primary)",
+                            }}>{s === "rect" ? "Прямоуг." : "Круглый"}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </>
+        )}
+
+        {section === "widget" && (
+          <>
+            <h2 style={{ fontSize: 22, fontWeight: 500, marginBottom: 20 }}>Настройки виджета</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 24 }}>
+              <div style={{ background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)", padding: 24, boxShadow: "var(--shadow-sm)" }}>
+                <div style={{ marginBottom: 20 }}>
+                  <label className="input-label">Тема виджета</label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {["dark", "light"].map(th => (
+                      <button key={th} onClick={() => setWidgetTheme(th)} style={{
+                        flex: 1, padding: 12, border: `1px solid ${widgetTheme === th ? "var(--color-primary)" : "var(--color-border)"}`,
+                        borderRadius: "var(--radius-md)", cursor: "pointer", fontSize: 13,
+                        background: th === "dark" ? "#1a1a1a" : "#fff", color: th === "dark" ? "#fff" : "#333",
+                      }}>{th === "dark" ? "Темная" : "Светлая"}</button>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <label className="input-label">Акцентный цвет</label>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <input type="color" value={widgetColor} onChange={e => setWidgetColor(e.target.value)} style={{ width: 40, height: 40, border: "none", cursor: "pointer", borderRadius: "var(--radius-sm)" }} />
+                    <input className="input-field" value={widgetColor} onChange={e => setWidgetColor(e.target.value)} style={{ flex: 1, fontSize: 13 }} />
+                  </div>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <label className="input-label">Текст кнопки</label>
+                  <input className="input-field" value={widgetBtnText} onChange={e => setWidgetBtnText(e.target.value)} />
+                </div>
+                <div>
+                  <label className="input-label">Код для встраивания</label>
+                  <div style={{ padding: 12, background: "var(--color-bg-elevated)", borderRadius: "var(--radius-sm)", fontFamily: "monospace", fontSize: 11, color: "var(--color-text-secondary)", wordBreak: "break-all" }}>
+                    {`<script src="https://restobooking.ru/widget.js" data-restaurant="beluga" data-theme="${widgetTheme}" data-color="${widgetColor}"></script>`}
+                  </div>
+                </div>
+              </div>
+              {/* Preview */}
+              <div style={{ background: widgetTheme === "dark" ? "#1a1a1a" : "#f5f5f5", borderRadius: "var(--radius-lg)", padding: 20, boxShadow: "var(--shadow-sm)" }}>
+                <div style={{ fontSize: 11, color: widgetTheme === "dark" ? "#666" : "#999", marginBottom: 8, textAlign: "center" }}>ПРЕДПРОСМОТР</div>
+                <div style={{ padding: 16, background: widgetTheme === "dark" ? "#222" : "#fff", borderRadius: 12 }}>
+                  <div style={{ fontSize: 16, fontWeight: 500, color: widgetTheme === "dark" ? "#fff" : "#333", marginBottom: 12 }}>Забронировать</div>
+                  <div style={{ height: 36, background: widgetTheme === "dark" ? "#333" : "#f0f0f0", borderRadius: 8, marginBottom: 8 }} />
+                  <div style={{ height: 36, background: widgetTheme === "dark" ? "#333" : "#f0f0f0", borderRadius: 8, marginBottom: 12 }} />
+                  <button style={{ width: "100%", padding: "10px", background: widgetColor, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>{widgetBtnText}</button>
+                  <div style={{ fontSize: 9, color: widgetTheme === "dark" ? "#555" : "#bbb", textAlign: "center", marginTop: 8 }}>RESTObooking</div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {section === "notifications" && (
+          <>
+            <h2 style={{ fontSize: 22, fontWeight: 500, marginBottom: 20 }}>Уведомления</h2>
+            <div style={{ background: "var(--color-bg-card)", borderRadius: "var(--radius-lg)", padding: 24, boxShadow: "var(--shadow-sm)", maxWidth: 600 }}>
+              {[
+                { label: "SMS о новом бронировании", desc: "Гость получит SMS с подтверждением", enabled: true },
+                { label: "Telegram уведомление", desc: "Мгновенное оповещение бота в чат ресторана", enabled: true },
+                { label: "Напоминание за 2 часа", desc: "Напомнить гостю о бронировании", enabled: false },
+                { label: "Запрос отзыва", desc: "На следующий день после визита", enabled: false },
+                { label: "Email подтверждение", desc: "Дублировать подтверждение на почту", enabled: false },
+              ].map((n, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: i < 4 ? "1px solid var(--color-border)" : "none" }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 400 }}>{n.label}</div>
+                    <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{n.desc}</div>
+                  </div>
+                  <div style={{ width: 44, height: 24, borderRadius: 12, background: n.enabled ? "var(--color-primary)" : "var(--color-bg-elevated)", cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
+                    <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.2)", position: "absolute", top: 2, left: n.enabled ? 22 : 2, transition: "left 0.2s" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </main>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>("venues");
 
@@ -402,6 +680,7 @@ export default function DashboardPage() {
       {activeTab === "tariffs" && <TariffsTab />}
       {activeTab === "staff" && <StaffTab />}
       {activeTab === "stats" && <StatsTab />}
+      {activeTab === "settings" && <SettingsTab />}
     </div>
   );
 }
