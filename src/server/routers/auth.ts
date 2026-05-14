@@ -50,7 +50,7 @@ export const authRouter = router({
         .replace(/^-|-$/g, "");
 
       // Создаём пользователя и ресторан в транзакции
-      const result = await ctx.prisma.$transaction(async (tx: typeof ctx.prisma) => {
+      const result = await ctx.prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
           data: {
             name: input.name,

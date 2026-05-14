@@ -1,27 +1,31 @@
-// Prisma client - будет активирован после настройки БД
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let PrismaClientModule: any;
-try {
-  PrismaClientModule = require("@prisma/client").PrismaClient;
-} catch {
-  PrismaClientModule = null;
-}
+import { PrismaClient } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: unknown | undefined;
+  prisma: PrismaClient | undefined;
 };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  (PrismaClientModule
-    ? new PrismaClientModule({
-        log:
-          process.env.NODE_ENV === "development"
-            ? ["query", "error", "warn"]
-            : ["error"],
-      })
-    : null);
+function createPrismaClient(): PrismaClient | null {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl || databaseUrl.includes("randompassword")) {
+    return null;
+  }
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  // Neon serverless adapter (для Vercel/edge)
+  // Позже при переносе на Beget VPS заменить на прямое подключение
+  const adapter = new PrismaNeon({ connectionString: databaseUrl });
+
+  return new PrismaClient({
+    adapter,
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  });
+}
+
+export const prisma: PrismaClient | null =
+  globalForPrisma.prisma ?? createPrismaClient();
+
+if (process.env.NODE_ENV !== "production" && prisma) {
+  globalForPrisma.prisma = prisma;
+}
 
 export default prisma;

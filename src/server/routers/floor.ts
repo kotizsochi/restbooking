@@ -48,11 +48,11 @@ export const floorRouter = router({
         return {
           hallId: hall.id,
           hallName: hall.name,
-          tables: tables.map((t: { id: string; label: string; positionX: number; positionY: number; tableType: string; maxCapacity: number; shape: string }) => ({
+          tables: tables.map((t) => ({
             id: t.id,
             label: t.label,
-            x: t.positionX || 100,
-            y: t.positionY || 100,
+            x: t.positionX ?? 100,
+            y: t.positionY ?? 100,
             type: t.tableType,
             seats: t.maxCapacity,
             shape: (t.shape as "circle" | "rect") || "rect",
@@ -68,11 +68,11 @@ export const floorRouter = router({
       return {
         hallId,
         hallName: hall?.name || "Зал",
-        tables: tables.map((t: { id: string; label: string; positionX: number; positionY: number; tableType: string; maxCapacity: number; shape: string }) => ({
+        tables: tables.map((t) => ({
           id: t.id,
           label: t.label,
-          x: t.positionX || 100,
-          y: t.positionY || 100,
+          x: t.positionX ?? 100,
+          y: t.positionY ?? 100,
           type: t.tableType,
           seats: t.maxCapacity,
           shape: (t.shape as "circle" | "rect") || "rect",
@@ -100,12 +100,16 @@ export const floorRouter = router({
       }
 
       // Удаляем все текущие столы и создаём заново (проще и надёжнее)
-      await ctx.prisma.table.deleteMany({ where: { hallId: input.hallId } });
+      const db = ctx.prisma;
+      const hall = await db.hall.findUnique({ where: { id: input.hallId } });
+      if (!hall) throw new Error("Зал не найден");
+      await db.table.deleteMany({ where: { hallId: input.hallId } });
 
       const created = await Promise.all(
         input.tables.map((t, i) =>
-          ctx.prisma.table.create({
+          db.table.create({
             data: {
+              restaurantId: hall.restaurantId,
               hallId: input.hallId,
               label: t.label,
               tableType: t.type,
