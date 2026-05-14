@@ -21,6 +21,18 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(self)",
           },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mc.yandex.ru https://www.googletagmanager.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' data: blob: https://images.unsplash.com https://api.qrserver.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "connect-src 'self' https://mc.yandex.ru https://www.google-analytics.com",
+              "frame-ancestors 'none'",
+            ].join("; "),
+          },
         ],
       },
     ];
