@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Building } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +30,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Неверный email или пароль");
       } else {
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       }
     } catch {
       setError("Ошибка авторизации");
@@ -143,7 +145,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} aria-label="Форма входа">
             <div style={{ marginBottom: 16 }}>
               <label
                 className="input-label"
@@ -157,6 +159,7 @@ export default function LoginPage() {
                 <Mail size={14} /> Email
               </label>
               <input
+                id="login-email"
                 className="input-field"
                 type="email"
                 placeholder="admin@restobooking.ru"
@@ -164,6 +167,8 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoFocus
+                aria-label="Email адрес"
+                autoComplete="email"
               />
             </div>
 
@@ -181,6 +186,7 @@ export default function LoginPage() {
               </label>
               <div style={{ position: "relative" }}>
                 <input
+                  id="login-password"
                   className="input-field"
                   type={showPassword ? "text" : "password"}
                   placeholder="Введите пароль"
@@ -188,6 +194,8 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   style={{ paddingRight: 44 }}
+                  aria-label="Пароль"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
