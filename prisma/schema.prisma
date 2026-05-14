@@ -219,6 +219,8 @@ model Table {
   tableType    TableType  @default(STANDARD)
   positionX    Float?
   positionY    Float?
+  shape        String     @default("rect")
+  sortOrder    Int        @default(0)
   tags         String[]
   isActive     Boolean    @default(true)
   crmTableId   String?
