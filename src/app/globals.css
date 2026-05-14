@@ -89,7 +89,7 @@ html {
 }
 
 body {
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-montserrat), 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 400;
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
@@ -633,4 +633,39 @@ h1, h2, h3, h4, h5, h6 {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+/* ===== DASHBOARD MOBILE ===== */
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-sidebar {
+    display: none;
+  }
+  .dashboard-sidebar.mobile-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    width: 260px;
+    overflow-y: auto;
+  }
+  .dashboard-detail-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    overflow-y: auto;
+    width: 100%;
+  }
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none !important;
+  }
 }

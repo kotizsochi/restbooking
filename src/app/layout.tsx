@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/SessionProvider";
 import { TRPCReactProvider } from "@/lib/trpc";
+
+// PERF-03: next/font self-hosts шрифт (не render-blocking)
+const montserrat = Montserrat({
+  subsets: ["latin", "cyrillic"],
+  weight: ["200", "300", "400", "500", "600"],
+  display: "swap",
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
   title: "RESTObooking - Бронирование ресторанов онлайн",
@@ -22,6 +31,12 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     url: "https://restobooking.ru",
   },
+  // FE-05: manifest + icons
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.svg",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 // Яндекс.Метрика ID (заменить на реальный после регистрации)
@@ -35,12 +50,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={montserrat.variable}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
-
         {/* Яндекс.Метрика */}
         {YM_ID && (
           <script dangerouslySetInnerHTML={{ __html: `

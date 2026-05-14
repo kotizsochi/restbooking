@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
 import {
   Phone, MapPin, ChevronDown, Users, X, CheckCircle2,
   Clock, CalendarDays, List, LayoutGrid, UserPlus,
 } from "lucide-react";
+import { useTRPC } from "@/lib/trpc";
+import { useQuery } from "@tanstack/react-query";
 
 /* ---- helpers ---- */
 function pad(n: number) { return String(n).padStart(2, "0"); }
@@ -213,6 +216,20 @@ function BookingForm({ table, timeFrom, restaurantSlug, onClose }: { table: Tabl
 
 /* ---- Main Widget ---- */
 export default function WidgetPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+
+  // Live data из PostgreSQL
+  const trpc = useTRPC();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const restaurantQuery = useQuery(trpc.restaurant.getBySlug.queryOptions({ slug })) as { data: any; isLoading: boolean };
+  const restaurant = restaurantQuery.data;
+
+  const restaurantName = restaurant?.name || "Ресторан";
+  const restaurantAddress = restaurant?.address || "";
+  const restaurantPhone = restaurant?.phone || "";
+  const restaurantId = restaurant?.id || slug;
+
   const [timeFrom, setTimeFrom] = useState(1110); // 18:30
   const [timeTo, setTimeTo] = useState(0); // 0 = not set (single mode)
   const [isGroupMode, setIsGroupMode] = useState(false);
@@ -230,7 +247,23 @@ export default function WidgetPage() {
     setIsGroupMode(!isGroupMode);
   };
 
-  const filteredTables = TABLES.filter((t) => activeZone === "Все залы" || t.zone === activeZone)
+  // Столы: live из halls/tables ресторана или fallback на mock
+  const liveTables: TableInfo[] = (restaurant?.halls || []).flatMap(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (hall: any) => (hall.tables || []).map((t: any, i: number) => ({
+      id: t.id || i + 1,
+      number: t.label || String(i + 1),
+      zone: hall.name || "Основной зал",
+      seats: t.maxCapacity || 4,
+      deposit: t.depositAmount || 0,
+      status: "free" as const,
+      photo: "",
+    }))
+  );
+  const widgetTables = liveTables.length > 0 ? liveTables : TABLES;
+  const liveZones = ["Все залы", ...new Set(widgetTables.map(t => t.zone))];
+
+  const filteredTables = widgetTables.filter((t) => activeZone === "Все залы" || t.zone === activeZone)
     .sort((a, b) => {
       if (sortBy === "occupancy") {
         const order = { free: 0, soon: 1, busy: 2 };
@@ -244,13 +277,15 @@ export default function WidgetPage() {
       {/* Header */}
       <div style={{ padding: "12px 20px", background: "#222", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 500, color: "#fff" }}>Белуга</div>
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Москва, ул. Тверская, 15</div>
+          <div style={{ fontSize: 16, fontWeight: 500, color: "#fff" }}>{restaurantName}</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>{restaurantAddress}</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <a href="tel:+78001234567" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>
-            <Phone size={12} /> 8 800 123-45-67
-          </a>
+          {restaurantPhone && (
+            <a href={`tel:${restaurantPhone}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "rgba(255,255,255,0.6)", textDecoration: "none" }}>
+              <Phone size={12} /> {restaurantPhone}
+            </a>
+          )}
           <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>RU</span>
         </div>
       </div>
@@ -277,7 +312,7 @@ export default function WidgetPage() {
 
       {/* Zone filters */}
       <div style={{ padding: "0 20px 12px", display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {ZONES.map((z) => (
+        {liveZones.map((z) => (
           <button key={z} onClick={() => setActiveZone(z)} style={{
             padding: "5px 12px", borderRadius: 14, fontSize: 12,
             background: activeZone === z ? "rgba(255,255,255,0.15)" : "transparent",
@@ -405,7 +440,7 @@ export default function WidgetPage() {
       </div>
 
       {/* Booking modal */}
-      {selectedTable && <BookingForm table={selectedTable} timeFrom={timeFrom} restaurantSlug="beluga" onClose={() => setSelectedTable(null)} />}
+      {selectedTable && <BookingForm table={selectedTable} timeFrom={timeFrom} restaurantSlug={restaurantId} onClose={() => setSelectedTable(null)} />}
     </div>
   );
 }

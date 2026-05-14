@@ -112,9 +112,9 @@ function VenuesTab() {
   const counts = { new: allBookings.filter(b => b.status === "new").length, confirmed: allBookings.filter(b => b.status === "confirmed").length, seated: allBookings.filter(b => b.status === "seated").length };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: selectedBooking ? "220px 1fr 320px" : "220px 1fr", minHeight: "calc(100vh - 56px)", transition: "all 0.3s ease" }}>
+    <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: selectedBooking ? "220px 1fr 320px" : "220px 1fr", minHeight: "calc(100vh - 56px)", transition: "all 0.3s ease" }}>
       {/* Sidebar */}
-      <aside style={{ background: "var(--color-bg-card)", padding: 16, boxShadow: "var(--shadow-sm)" }}>
+      <aside className="dashboard-sidebar" style={{ background: "var(--color-bg-card)", padding: 16, boxShadow: "var(--shadow-sm)" }}>
         <h4 style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-muted)", letterSpacing: "0.1em", marginBottom: 12 }}>ЗАВЕДЕНИЯ</h4>
         <div style={{ padding: "10px 12px", background: "var(--color-primary)", borderRadius: "var(--radius-md)", color: "#fff", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
           <div>
@@ -325,7 +325,7 @@ function TariffsTab() {
 
 function StaffTab() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", minHeight: "calc(100vh - 56px)" }}>
+    <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "220px 1fr", minHeight: "calc(100vh - 56px)" }}>
       <aside style={{ background: "var(--color-bg-card)", padding: 16 }}>
         <h4 style={{ fontSize: 11, fontWeight: 500, color: "var(--color-text-muted)", letterSpacing: "0.1em", marginBottom: 12 }}>СОТРУДНИКИ</h4>
         <button style={{ fontSize: 13, color: "var(--color-primary)", background: "none", border: "none", cursor: "pointer", marginBottom: 8 }}>Все сотрудники</button>

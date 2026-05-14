@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { neon } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import bcrypt from "bcryptjs";
 import "dotenv/config";
 
 const databaseUrl = process.env.DATABASE_URL!;
@@ -10,7 +11,7 @@ const prisma = new PrismaClient({ adapter });
 
 // Демо-пользователь (владелец всех ресторанов в seed)
 const DEMO_OWNER_EMAIL = "admin@restobooking.ru";
-const DEMO_OWNER_HASH = "$2b$10$dummyHashForSeeding";
+const DEMO_OWNER_HASH = bcrypt.hashSync("demo2026", 10);
 
 const RESTAURANTS = [
   { name: "Краб Хаус", slug: "krab-haus", desc: "Ресторан морепродуктов на набережной Сочи с террасой и видом на Черное море. Свежие крабы, мидии и устрицы.", shortDesc: "Крабы и морепродукты Черного моря", cuisine: ["SEAFOOD"], priceRange: "PREMIUM" as const, city: "Сочи", address: "Курортный пр., 12", avgRating: 4.3, reviewCount: 1567, cover: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=75", deposit: 1000, features: ["sea_view","terrace","parking"], tables: [{ label: "1", min: 2, max: 4, type: "STANDARD" as const }, { label: "2", min: 2, max: 2, type: "BAR" as const }, { label: "VIP", min: 2, max: 8, type: "VIP" as const }] },
