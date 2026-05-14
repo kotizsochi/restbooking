@@ -44,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             credentials.email === demoEmail &&
             credentials.password === demoPass
           ) {
+            console.log(`[SECURITY] AUTH_LOGIN_SUCCESS | demo | Email: ${demoEmail}`);
             return {
               id: "demo-admin",
               name: "Demo Admin",
@@ -51,6 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               role: "RESTAURANT_ADMIN",
             };
           }
+          console.log(`[SECURITY] AUTH_LOGIN_FAILED | demo | Email: ${credentials.email}`);
           return null;
         }
 
@@ -59,12 +61,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
         });
-        if (!user || !user.passwordHash) return null;
+        if (!user || !user.passwordHash) {
+          console.log(`[SECURITY] AUTH_LOGIN_FAILED | Email: ${credentials.email} | Reason: user_not_found`);
+          return null;
+        }
         const isValid = await verifyPassword(
           credentials.password as string,
           user.passwordHash
         );
-        if (!isValid) return null;
+        if (!isValid) {
+          console.log(`[SECURITY] AUTH_LOGIN_FAILED | Email: ${credentials.email} | Reason: invalid_password`);
+          return null;
+        }
+        console.log(`[SECURITY] AUTH_LOGIN_SUCCESS | Email: ${user.email} | ID: ${user.id}`);
         return {
           id: user.id,
           name: user.name,

@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "@/components/SessionProvider";
 import { TRPCReactProvider } from "@/lib/trpc";
+import { CookieConsent } from "@/components/CookieConsent";
 
 // PERF-03: next/font self-hosts шрифт (не render-blocking)
 const montserrat = Montserrat({
@@ -82,6 +83,7 @@ export default function RootLayout({
         <SessionProvider>
           <TRPCReactProvider>
             {children}
+            <CookieConsent />
           </TRPCReactProvider>
         </SessionProvider>
       </body>

@@ -35,6 +35,7 @@ export function middleware(request: NextRequest) {
     const window = 60_000;
 
     if (isRateLimited(`${ip}:${isAuth ? "auth" : "api"}`, limit, window)) {
+      console.log(`[SECURITY] RATE_LIMIT_HIT | IP: ${ip} | Path: ${pathname} | Type: ${isAuth ? "auth" : "api"}`);
       return NextResponse.json(
         { error: "Too many requests" },
         { status: 429, headers: { "Retry-After": "60" } }
@@ -45,6 +46,7 @@ export function middleware(request: NextRequest) {
   // Rate limiting для tRPC booking.create (отдельный лимит)
   if (pathname.startsWith("/api/trpc/booking.create")) {
     if (isRateLimited(`${ip}:booking`, 10, 60_000)) {
+      console.log(`[SECURITY] RATE_LIMIT_HIT | IP: ${ip} | Path: booking.create`);
       return NextResponse.json(
         { error: "Too many bookings" },
         { status: 429 }

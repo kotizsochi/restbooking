@@ -355,15 +355,33 @@ function StaffTab() {
 }
 
 function StatsTab() {
+  const trpc = useTRPC();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bookingsQuery = useQuery(trpc.booking.myRestaurantBookings.queryOptions()) as { data: any; isLoading: boolean };
+  const bookings = bookingsQuery.data?.bookings || [];
+  const total = bookingsQuery.data?.total || 0;
+
+  // Рассчитываем live метрики
+  const confirmed = bookings.filter((b: { status: string }) => b.status === "CONFIRMED" || b.status === "SEATED" || b.status === "COMPLETED").length;
+  const cancelled = bookings.filter((b: { status: string }) => b.status === "CANCELLED" || b.status === "NO_SHOW").length;
+  const pending = bookings.filter((b: { status: string }) => b.status === "PENDING").length;
+
   const metrics = [
-    { label: "Всего посещений", value: "47", sub: "с 01.05.26", trend: "+12%" },
-    { label: "Всего броней", value: "52", sub: "100% от посещений", trend: "+8%" },
-    { label: "Новые брони", value: "38", sub: "73% от броней", trend: "+15%" },
-    { label: "Повторные брони", value: "14", sub: "27% от броней", trend: "+3%" },
-    { label: "Отмененные", value: "5", sub: "9% от броней", trend: "-2%" },
+    { label: "Всего бронирований", value: String(total), sub: "в системе", trend: total > 0 ? "+100%" : "0%" },
+    { label: "Подтверждено", value: String(confirmed), sub: `${total ? Math.round(confirmed / total * 100) : 0}% от броней`, trend: `+${confirmed}` },
+    { label: "Ожидание", value: String(pending), sub: "новых заявок", trend: pending > 0 ? `+${pending}` : "0" },
+    { label: "Отменено / No-show", value: String(cancelled), sub: `${total ? Math.round(cancelled / total * 100) : 0}% от броней`, trend: cancelled > 0 ? `-${cancelled}` : "0" },
   ];
+
+  // Распределение по дням недели (из реальных бронирований)
   const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-  const dayValues = [12, 8, 15, 20, 28, 45, 35];
+  const dayValues = [0, 0, 0, 0, 0, 0, 0];
+  bookings.forEach((b: { date: string | Date }) => {
+    const d = new Date(b.date);
+    const day = d.getDay(); // 0=Sun
+    dayValues[day === 0 ? 6 : day - 1]++;
+  });
+  const maxDay = Math.max(...dayValues, 1);
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", minHeight: "calc(100vh - 56px)" }}>
@@ -392,9 +410,21 @@ function StatsTab() {
           <div style={{ padding: 20, background: "var(--color-bg-card)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-xs)" }}>
             <h3 style={{ fontSize: 15, fontWeight: 500, marginBottom: 16 }}>Посещаемость</h3>
             <div style={{ height: 160, display: "flex", alignItems: "flex-end", gap: 4, paddingBottom: 24, position: "relative" }}>
-              {[5, 8, 12, 15, 10, 22, 18, 25, 20, 30, 28, 35, 32, 40].map((v, i) => (
-                <div key={i} style={{ flex: 1, background: "var(--color-primary)", borderRadius: "2px 2px 0 0", height: `${(v / 40) * 100}%`, opacity: 0.7, transition: "height var(--transition-base)" }} />
-              ))}
+              {bookings.length === 0 ? (
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-muted)", fontSize: 13 }}>Нет данных</div>
+              ) : (
+                // Группируем по дате (последние 14 дней)
+                Array.from({ length: 14 }).map((_, i) => {
+                  const d = new Date(); d.setDate(d.getDate() - 13 + i);
+                  const key = d.toISOString().split("T")[0];
+                  const count = bookings.filter((b: { date: string | Date }) => new Date(b.date).toISOString().split("T")[0] === key).length;
+                  const maxBar = Math.max(...Array.from({ length: 14 }).map((_, j) => {
+                    const dd = new Date(); dd.setDate(dd.getDate() - 13 + j);
+                    return bookings.filter((b: { date: string | Date }) => new Date(b.date).toISOString().split("T")[0] === dd.toISOString().split("T")[0]).length;
+                  }), 1);
+                  return <div key={i} title={key} style={{ flex: 1, background: "var(--color-primary)", borderRadius: "2px 2px 0 0", height: `${(count / maxBar) * 100}%`, opacity: count > 0 ? 0.7 : 0.15, transition: "height var(--transition-base)" }} />;
+                })
+              )}
             </div>
           </div>
           <div style={{ padding: 20, background: "var(--color-bg-card)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-xs)" }}>
@@ -404,7 +434,7 @@ function StatsTab() {
                 <div key={d} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ fontSize: 12, width: 20, color: "var(--color-text-muted)" }}>{d}</span>
                   <div style={{ flex: 1, height: 16, background: "var(--color-bg-elevated)", borderRadius: 3, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${(dayValues[i] / 50) * 100}%`, background: i >= 5 ? "var(--color-primary)" : "var(--color-bg-hover)", borderRadius: 3, transition: "width var(--transition-base)" }} />
+                    <div style={{ height: "100%", width: `${(dayValues[i] / maxDay) * 100}%`, background: i >= 5 ? "var(--color-primary)" : "var(--color-bg-hover)", borderRadius: 3, transition: "width var(--transition-base)" }} />
                   </div>
                   <span style={{ fontSize: 11, color: "var(--color-text-muted)", width: 24 }}>{dayValues[i]}</span>
                 </div>

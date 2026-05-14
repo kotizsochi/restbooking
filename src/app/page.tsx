@@ -8,12 +8,12 @@ import {
   ArrowRight, CheckCircle2,
 } from "lucide-react";
 import { MOCK_RESTAURANTS } from "@/lib/mock-data";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import Link from "next/link";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
 import { useTRPC } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 const CITIES = ["Все города", "Москва", "Санкт-Петербург", "Сочи"];
 const GUEST_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -56,37 +56,6 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-function Header() {
-  const { data: session } = useSession();
-  return (
-    <header className="glass-card header-separator" style={{
-      position: "sticky", top: 0, zIndex: 50, borderRadius: 0,
-    }}>
-      <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: "var(--radius-md)",
-            background: "var(--color-primary)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 18, fontWeight: 500, color: "#ffffff",
-          }}>R</div>
-          <span style={{ fontSize: 18, fontWeight: 500, color: "var(--color-text-primary)", letterSpacing: "-0.01em" }}>
-            RESTO<span style={{ color: "var(--color-primary)" }}>booking</span>
-          </span>
-        </Link>
-        <nav style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Link href="/for-restaurants" className="btn btn-ghost btn-sm" style={{ textDecoration: "none" }}>Для ресторанов</Link>
-          <ThemeToggle />
-          {session ? (
-            <Link href="/dashboard" className="btn btn-primary btn-sm" style={{ textDecoration: "none" }}>Личный кабинет</Link>
-          ) : (
-            <Link href="/login" className="btn btn-primary btn-sm" style={{ textDecoration: "none" }}>Войти</Link>
-          )}
-        </nav>
-      </div>
-    </header>
-  );
-}
 
 function HeroSection({ onSearch }: { onSearch: (city: string) => void }) {
   const [city, setCity] = useState("Москва");
@@ -429,44 +398,6 @@ function FeaturesSection() {
   );
 }
 
-function Footer() {
-  return (
-    <footer style={{ padding: "40px 0", background: "var(--color-bg-secondary)" }}>
-      <div className="container" style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-        gap: 32,
-      }}>
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <div style={{
-              width: 28, height: 28, borderRadius: "var(--radius-sm)",
-              background: "var(--color-primary)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 14, fontWeight: 500, color: "#ffffff",
-            }}>R</div>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>RESTO<span style={{ color: "var(--color-primary)" }}>booking</span></span>
-          </div>
-          <p style={{ fontSize: 13, color: "var(--color-text-muted)", maxWidth: 260 }}>
-            Сервис бронирования и книга резервов для ресторанов
-          </p>
-        </div>
-        {[
-          { title: "ГОСТЯМ", links: ["Рестораны", "Акции", "Приложение"] },
-          { title: "РЕСТОРАНАМ", links: ["Подключение", "Тарифы", "API"] },
-          { title: "КОМПАНИЯ", links: ["О нас", "Контакты", "Блог"] },
-        ].map((col) => (
-          <div key={col.title}>
-            <h4 style={{ fontSize: 11, fontWeight: 500, marginBottom: 12, color: "var(--color-text-muted)", letterSpacing: "0.1em" }}>{col.title}</h4>
-            {col.links.map((link) => (
-              <a key={link} href="#" style={{ display: "block", fontSize: 13, color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: 8, transition: "color var(--transition-fast)" }}>{link}</a>
-            ))}
-          </div>
-        ))}
-      </div>
-    </footer>
-  );
-}
 
 export default function HomePage() {
   const [filteredCity, setFilteredCity] = useState("Москва");
