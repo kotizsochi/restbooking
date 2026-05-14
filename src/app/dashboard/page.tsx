@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useDebounce } from "@/lib/hooks";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -77,6 +78,7 @@ function VenuesTab() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
 
   // Live data из PostgreSQL
   const trpc = useTRPC();
@@ -110,7 +112,7 @@ function VenuesTab() {
 
   const filtered = allBookings.filter((b) => {
     if (filter !== "all" && b.status !== filter) return false;
-    if (search && !b.guest.toLowerCase().includes(search.toLowerCase()) && !b.phone.includes(search)) return false;
+    if (debouncedSearch && !b.guest.toLowerCase().includes(debouncedSearch.toLowerCase()) && !b.phone.includes(debouncedSearch)) return false;
     return true;
   });
   const today = new Date().toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" });
