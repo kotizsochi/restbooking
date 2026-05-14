@@ -40,7 +40,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const demoPass = process.env.DEMO_PASSWORD || "demo2026";
 
         // Demo-режим: работает всегда когда DEMO_MODE=true
-        if (process.env.DEMO_MODE === "true") {
+        const isDemoMode = (process.env.DEMO_MODE || "").trim().toLowerCase() === "true";
+        if (isDemoMode) {
           if (
             credentials.email === demoEmail &&
             credentials.password === demoPass
@@ -67,7 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user || !user.passwordHash) {
           // Fallback: если user нет в БД, но это demo credentials
           if (
-            process.env.DEMO_MODE === "true" &&
+            isDemoMode &&
             credentials.email === demoEmail &&
             credentials.password === demoPass
           ) {

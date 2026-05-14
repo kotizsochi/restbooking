@@ -31,7 +31,7 @@ export function middleware(request: NextRequest) {
   // Rate limiting для API
   if (pathname.startsWith("/api/")) {
     const isAuth = pathname.includes("/auth/");
-    const limit = isAuth ? 5 : 30; // 5/min для auth, 30/min для остальных
+    const limit = isAuth ? 20 : 30; // 20/min для auth (NextAuth делает ~5 req/login), 30/min для остальных
     const window = 60_000;
 
     if (isRateLimited(`${ip}:${isAuth ? "auth" : "api"}`, limit, window)) {
