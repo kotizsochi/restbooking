@@ -143,6 +143,7 @@ export const bookingRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      if (!ctx.prisma) throw new Error("Database not available");
       const booking = await ctx.prisma.reservation.update({
         where: { id: input.bookingId },
         data: { status: input.status },
