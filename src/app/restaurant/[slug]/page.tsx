@@ -12,6 +12,8 @@ import { MOCK_RESTAURANTS, getAvailableSlots } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
 import { FloorPlan } from "@/components/FloorPlan";
+import { useTRPC } from "@/lib/trpc";
+import { useMutation } from "@tanstack/react-query";
 
 const CUISINE_LABELS: Record<string, string> = {
   RUSSIAN: "Русская", ITALIAN: "Итальянская", JAPANESE: "Японская",
@@ -62,6 +64,21 @@ export default function RestaurantPage() {
   const [specialRequests, setSpecialRequests] = useState("");
   const [guestName, setGuestName] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
+  const [bookingError, setBookingError] = useState("");
+  const [bookingId, setBookingId] = useState("");
+
+  const trpc = useTRPC();
+  const createBooking = useMutation(
+    trpc.booking.create.mutationOptions({
+      onSuccess: (data) => {
+        if (data?.id) setBookingId(String(data.id));
+        setBookingStep("success");
+      },
+      onError: () => {
+        setBookingError("Ошибка при бронировании. Попробуйте ещё раз.");
+      },
+    })
+  );
 
   const availableSlots = useMemo(() => {
     if (!restaurant) return [];
@@ -86,7 +103,18 @@ export default function RestaurantPage() {
   }
 
   const handleConfirmBooking = () => {
-    setBookingStep("success");
+    setBookingError("");
+    createBooking.mutate({
+      restaurantId: restaurant.id,
+      date: selectedDate,
+      time: selectedTime!,
+      guestCount,
+      guestName,
+      guestPhone: guestPhone.replace(/\D/g, ""),
+      tableId: selectedTable || undefined,
+      specialRequests: specialRequests || undefined,
+      source: "PLATFORM_WEB",
+    });
   };
 
   const formatDate = (dateStr: string) => {
@@ -402,12 +430,18 @@ export default function RestaurantPage() {
                       style={{ resize: "vertical" }} />
                   </div>
 
+                  {bookingError && (
+                    <div style={{ padding: "10px 14px", background: "rgba(220,53,69,0.08)", border: "1px solid rgba(220,53,69,0.2)", borderRadius: "var(--radius-sm)", color: "var(--color-error)", fontSize: 13, marginBottom: 16, textAlign: "center" }}>
+                      {bookingError}
+                    </div>
+                  )}
+
                   <div style={{ display: "flex", gap: 12 }}>
-                    <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setBookingStep("select")}>Назад</button>
-                    <button className="btn btn-primary" style={{ flex: 2 }}
-                      disabled={!guestName || !guestPhone}
+                    <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setBookingStep("select")} disabled={createBooking.isPending}>Назад</button>
+                    <button className="btn btn-primary" style={{ flex: 2, opacity: createBooking.isPending ? 0.7 : 1 }}
+                      disabled={!guestName || !guestPhone || createBooking.isPending}
                       onClick={handleConfirmBooking}>
-                      Забронировать
+                      {createBooking.isPending ? "Отправка..." : "Забронировать"}
                     </button>
                   </div>
                 </>
@@ -424,6 +458,7 @@ export default function RestaurantPage() {
                     <Check size={32} style={{ color: "var(--color-success)" }} />
                   </div>
                   <h3 style={{ fontSize: 24, fontWeight: 500, marginBottom: 8 }}>Бронь подтверждена!</h3>
+                  {bookingId && <p style={{ fontSize: 12, color: "var(--color-primary)", marginBottom: 4 }}>ID: {bookingId}</p>}
                   <p style={{ fontSize: 14, color: "var(--color-text-secondary)", marginBottom: 20 }}>
                     {restaurant.name}<br />
                     {formatDate(selectedDate)}, {selectedTime}<br />

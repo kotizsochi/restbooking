@@ -108,12 +108,50 @@ function TimeSlider({ value, onChange, label, min = 720, max = 1440 }: {
 }
 
 /* ---- BookingForm modal ---- */
-function BookingForm({ table, timeFrom, onClose }: { table: TableInfo; timeFrom: number; onClose: () => void }) {
+function BookingForm({ table, timeFrom, restaurantSlug, onClose }: { table: TableInfo; timeFrom: number; restaurantSlug: string; onClose: () => void }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState(2);
   const [comment, setComment] = useState("");
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [bookingId, setBookingId] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (!name || !phone) return;
+    setLoading(true);
+    setError("");
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const res = await fetch("/api/trpc/booking.create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          json: {
+            restaurantId: restaurantSlug,
+            date: today,
+            time: minutesToTime(timeFrom),
+            guestCount: guests,
+            guestName: name,
+            guestPhone: phone.replace(/\D/g, ""),
+            tableId: String(table.id),
+            specialRequests: comment || undefined,
+            source: "WIDGET" as const,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (data?.result?.data?.json?.id) {
+        setBookingId(data.result.data.json.id);
+      }
+      setSent(true);
+    } catch {
+      setError("Ошибка при отправке. Попробуйте ещё раз.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (sent) return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -121,6 +159,7 @@ function BookingForm({ table, timeFrom, onClose }: { table: TableInfo; timeFrom:
         <CheckCircle2 size={48} style={{ color: "#2d8a5e", marginBottom: 12 }} />
         <h3 style={{ fontSize: 20, fontWeight: 500, marginBottom: 8, color: "#1a1a1a" }}>Бронь отправлена!</h3>
         <p style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Столик #{table.number}, {minutesToTime(timeFrom)}</p>
+        {bookingId && <p style={{ fontSize: 12, color: "#927555", marginBottom: 4 }}>ID: {bookingId}</p>}
         <p style={{ fontSize: 13, color: "#999", marginBottom: 20 }}>Ожидайте подтверждение от ресторана</p>
         <button onClick={onClose} style={{ padding: "10px 32px", background: "#927555", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, cursor: "pointer" }}>OK</button>
       </div>
@@ -138,6 +177,7 @@ function BookingForm({ table, timeFrom, onClose }: { table: TableInfo; timeFrom:
           <div style={{ padding: "6px 10px", background: "#f5f5f5", borderRadius: 6, fontSize: 13, color: "#333" }}>{minutesToTime(timeFrom)}</div>
         </div>
         {table.deposit > 0 && <div style={{ padding: "8px 12px", background: "rgba(146,117,85,0.08)", borderRadius: 6, fontSize: 13, color: "#927555", marginBottom: 16 }}>Депозит: {table.deposit.toLocaleString("ru")} руб.</div>}
+        {error && <div style={{ padding: "8px 12px", background: "rgba(220,53,69,0.08)", borderRadius: 6, fontSize: 13, color: "#dc3545", marginBottom: 12 }}>{error}</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <input placeholder="Ваше имя *" value={name} onChange={(e) => setName(e.target.value)} style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 14, outline: "none" }} />
           <input placeholder="+7 (___) ___-__-__" type="tel" value={phone || "+7"} onChange={(e) => {
@@ -161,9 +201,9 @@ function BookingForm({ table, timeFrom, onClose }: { table: TableInfo; timeFrom:
           </div>
           <textarea placeholder="Комментарий (необязательно)" value={comment} onChange={(e) => setComment(e.target.value)} rows={2} style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 14, resize: "none", outline: "none" }} />
         </div>
-        <button onClick={() => setSent(true)} disabled={!name || !phone}
-          style={{ width: "100%", marginTop: 16, padding: "12px", background: name && phone ? "#927555" : "#ccc", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: name && phone ? "pointer" : "not-allowed" }}>
-          ЗАБРОНИРОВАТЬ
+        <button onClick={handleSubmit} disabled={!name || !phone || loading}
+          style={{ width: "100%", marginTop: 16, padding: "12px", background: name && phone && !loading ? "#927555" : "#ccc", color: "#fff", border: "none", borderRadius: 8, fontSize: 14, fontWeight: 500, cursor: name && phone && !loading ? "pointer" : "not-allowed" }}>
+          {loading ? "ОТПРАВКА..." : "ЗАБРОНИРОВАТЬ"}
         </button>
         <p style={{ fontSize: 11, color: "#999", textAlign: "center", marginTop: 8 }}>Сервис бронирования RESTObooking</p>
       </div>
@@ -365,7 +405,7 @@ export default function WidgetPage() {
       </div>
 
       {/* Booking modal */}
-      {selectedTable && <BookingForm table={selectedTable} timeFrom={timeFrom} onClose={() => setSelectedTable(null)} />}
+      {selectedTable && <BookingForm table={selectedTable} timeFrom={timeFrom} restaurantSlug="beluga" onClose={() => setSelectedTable(null)} />}
     </div>
   );
 }

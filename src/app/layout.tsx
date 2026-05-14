@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SessionProvider } from "@/components/SessionProvider";
+import { TRPCReactProvider } from "@/lib/trpc";
 
 export const metadata: Metadata = {
   title: "RESTObooking - Бронирование ресторанов онлайн",
@@ -68,7 +69,9 @@ export default function RootLayout({
       <body>
         <div className="gradient-bg" />
         <SessionProvider>
-          {children}
+          <TRPCReactProvider>
+            {children}
+          </TRPCReactProvider>
         </SessionProvider>
       </body>
     </html>
