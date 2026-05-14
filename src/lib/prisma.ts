@@ -1,17 +1,26 @@
-import { PrismaClient } from "@prisma/client";
+// Prisma client - будет активирован после настройки БД
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let PrismaClientModule: any;
+try {
+  PrismaClientModule = require("@prisma/client").PrismaClient;
+} catch {
+  PrismaClientModule = null;
+}
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+  prisma: unknown | undefined;
 };
 
 export const prisma =
   globalForPrisma.prisma ??
-  new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
-  });
+  (PrismaClientModule
+    ? new PrismaClientModule({
+        log:
+          process.env.NODE_ENV === "development"
+            ? ["query", "error", "warn"]
+            : ["error"],
+      })
+    : null);
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
