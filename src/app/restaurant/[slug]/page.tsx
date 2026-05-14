@@ -277,7 +277,7 @@ export default function RestaurantPage() {
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <span style={{ fontSize: 13, color: "var(--color-text-secondary)" }}>Депозит</span>
                         <span style={{ fontWeight: 400, color: "var(--color-primary)", fontSize: 16 }}>
-                          {new Intl.NumberFormat("ru-RU").format(depositAmount)} u20BD
+                          {new Intl.NumberFormat("ru-RU").format(depositAmount)} руб.
                         </span>
                       </div>
                       {selectedSlot?.isPeak && (
@@ -312,7 +312,7 @@ export default function RestaurantPage() {
                     {depositAmount > 0 && (
                       <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--color-border)", display: "flex", justifyContent: "space-between" }}>
                         <span style={{ fontWeight: 500 }}>Депозит:</span>
-                        <span style={{ fontWeight: 400, color: "var(--color-primary)" }}>{new Intl.NumberFormat("ru-RU").format(depositAmount)} u20BD</span>
+                        <span style={{ fontWeight: 400, color: "var(--color-primary)" }}>{new Intl.NumberFormat("ru-RU").format(depositAmount)} руб.</span>
                       </div>
                     )}
                   </div>
@@ -361,7 +361,7 @@ export default function RestaurantPage() {
                   </p>
                   {depositAmount > 0 && (
                     <div className="badge badge-gold" style={{ marginBottom: 16, fontSize: 14, padding: "8px 16px" }}>
-                      Депозит: {new Intl.NumberFormat("ru-RU").format(depositAmount)} u20BD
+                      Депозит: {new Intl.NumberFormat("ru-RU").format(depositAmount)} руб.
                     </div>
                   )}
                   <p style={{ fontSize: 13, color: "var(--color-text-muted)", marginBottom: 20 }}>
