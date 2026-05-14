@@ -25,7 +25,18 @@ export const notificationRouter = router({
     });
 
     if (!restaurant) {
-      return { channels: [], telegramBotToken: null, telegramChatId: null };
+      // Fallback: дефолтные каналы если ресторан не привязан к текущему user
+      return {
+        channels: [
+          { key: "sms_new_booking", label: "SMS о новом бронировании", desc: "Гость получит SMS с подтверждением", enabled: true, channel: "sms" as const },
+          { key: "tg_new_booking", label: "Telegram уведомление", desc: "Мгновенное оповещение бота в чат ресторана", enabled: true, channel: "telegram" as const },
+          { key: "sms_reminder", label: "Напоминание за 2 часа", desc: "Напомнить гостю о бронировании", enabled: false, channel: "sms" as const },
+          { key: "email_review", label: "Запрос отзыва", desc: "На следующий день после визита", enabled: false, channel: "email" as const },
+          { key: "email_confirm", label: "Email подтверждение", desc: "Дублировать подтверждение на почту", enabled: false, channel: "email" as const },
+        ],
+        telegramBotToken: null,
+        telegramChatId: null,
+      };
     }
 
     // Возвращаем из JSON настроек ресторана

@@ -503,13 +503,21 @@ function NotificationsList() {
     onSuccess: () => settingsQuery.refetch(),
   }));
 
-  const channels = settingsQuery.data?.channels || [
+  const DEFAULTS = [
     { key: "sms_new_booking", label: "SMS о новом бронировании", desc: "Гость получит SMS с подтверждением", enabled: true, channel: "sms" as const },
     { key: "tg_new_booking", label: "Telegram уведомление", desc: "Мгновенное оповещение бота в чат ресторана", enabled: true, channel: "telegram" as const },
     { key: "sms_reminder", label: "Напоминание за 2 часа", desc: "Напомнить гостю о бронировании", enabled: false, channel: "sms" as const },
     { key: "email_review", label: "Запрос отзыва", desc: "На следующий день после визита", enabled: false, channel: "email" as const },
     { key: "email_confirm", label: "Email подтверждение", desc: "Дублировать подтверждение на почту", enabled: false, channel: "email" as const },
   ];
+
+  // Fix: пустой массив [] truthy в JS, поэтому || не работает - проверяем .length
+  const apiChannels = settingsQuery.data?.channels;
+  const channels = (apiChannels && apiChannels.length > 0) ? apiChannels : DEFAULTS;
+
+  if (settingsQuery.isLoading) {
+    return <div style={{ padding: 16, fontSize: 13, color: "var(--color-text-muted)" }}>Загрузка настроек...</div>;
+  }
 
   return (
     <>
@@ -521,12 +529,16 @@ function NotificationsList() {
           </div>
           <div
             onClick={() => toggleMut.mutate({ key: n.key, enabled: !n.enabled })}
+            role="switch"
+            aria-checked={n.enabled}
+            aria-label={n.label}
             style={{
               width: 44, height: 24, borderRadius: 12,
               background: n.enabled ? "var(--color-primary)" : "var(--color-bg-elevated)",
               cursor: toggleMut.isPending ? "wait" : "pointer",
               position: "relative", transition: "background 0.2s",
               opacity: toggleMut.isPending ? 0.6 : 1,
+              border: n.enabled ? "none" : "1px solid var(--color-border)",
             }}
           >
             <div style={{
