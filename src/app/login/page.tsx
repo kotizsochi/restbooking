@@ -28,12 +28,16 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Неверный email или пароль");
+        if (result.error.includes("429") || result.error.includes("rate") || result.status === 429) {
+          setError("Слишком много попыток входа. Подождите минуту и попробуйте снова.");
+        } else {
+          setError("Неверный email или пароль");
+        }
       } else {
         router.push("/dashboard");
       }
     } catch {
-      setError("Ошибка авторизации");
+      setError("Ошибка соединения с сервером. Попробуйте позже.");
     } finally {
       setLoading(false);
     }
