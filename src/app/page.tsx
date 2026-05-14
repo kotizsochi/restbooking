@@ -468,11 +468,21 @@ export default function HomePage() {
       <Header />
       <main>
         <HeroSection onSearch={(city) => setFilteredCity(city)} />
-        <section className="container" style={{ paddingBottom: 40 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
-            <h2 style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 500 }}>
-              Рестораны {filteredCity !== "Все города" && <>в городе <span style={{ color: "var(--color-primary)" }}>{filteredCity}</span></>}
+        <section className="container" style={{ paddingTop: "clamp(40px, 6vw, 64px)", paddingBottom: 40 }}>
+          {/* CTA description */}
+          <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto clamp(32px, 5vw, 56px)", }}>
+            <h2 style={{ fontSize: "clamp(20px, 3vw, 30px)", fontWeight: 500, marginBottom: 12 }}>
+              Откройте лучшие рестораны <span style={{ color: "var(--color-primary)" }}>{filteredCity !== "Все города" ? filteredCity : "России"}</span>
             </h2>
+            <p style={{ fontSize: "clamp(13px, 1.5vw, 16px)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
+              Бронируйте столик онлайн с мгновенным подтверждением. Для ресторанов доступна CRM-система с электронной книгой резервов, интеграцией с iiko и r_keeper.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+            <h3 style={{ fontSize: "clamp(18px, 2.5vw, 22px)", fontWeight: 500 }}>
+              Рестораны {filteredCity !== "Все города" && <>в городе <span style={{ color: "var(--color-primary)" }}>{filteredCity}</span></>}
+            </h3>
             <span style={{ fontSize: 14, color: "var(--color-text-muted)" }}>{restaurants.length} заведений</span>
           </div>
 

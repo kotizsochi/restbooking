@@ -116,11 +116,10 @@ export default function RestaurantPage() {
             {/* Cover */}
             <div className="animate-fade-in" style={{
               height: 320, borderRadius: "var(--radius-lg)", overflow: "hidden",
-              background: "linear-gradient(135deg, var(--color-bg-card), var(--color-bg-elevated))",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              marginBottom: 32, border: "1px solid var(--color-border)",
+              position: "relative", marginBottom: 32,
             }}>
-              <Wine size={64} style={{ color: "var(--color-text-muted)", opacity: 0.2 }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={restaurant.coverImage} alt={restaurant.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
 
             {/* Info */}
