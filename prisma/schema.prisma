@@ -176,6 +176,7 @@ model Restaurant {
   reviews     Review[]
   favorites   Favorite[]
   crmSyncLogs CRMSyncLog[]
+  waitList    WaitListEntry[]
 
   @@index([city])
   @@index([avgRating])
@@ -427,4 +428,28 @@ model CRMSyncLog {
   @@index([restaurantId])
   @@index([createdAt])
   @@map("crm_sync_logs")
+}
+
+// ==========================================
+// ЛИСТ ОЖИДАНИЯ
+// ==========================================
+
+model WaitListEntry {
+  id            String     @id @default(cuid())
+  restaurantId  String
+  guestName     String
+  guestPhone    String
+  guestCount    Int        @default(2)
+  preferredDate String?    // "2026-05-15"
+  preferredTime String?    // "19:00"
+  notifyVia     String     @default("telegram") // telegram | sms | email
+  telegramChatId String?
+  status        String     @default("WAITING") // WAITING | NOTIFIED | BOOKED | EXPIRED
+  notifiedAt    DateTime?
+  createdAt     DateTime   @default(now())
+
+  restaurant    Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId, status])
+  @@map("wait_list")
 }
