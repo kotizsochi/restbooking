@@ -275,20 +275,21 @@ function VenuesTab() {
 
 function TariffsTab() {
   const [period, setPeriod] = useState("1m");
-  const periods = [{ k: "1y", l: "1 год - 12%" }, { k: "6m", l: "6 мес - 6%" }, { k: "3m", l: "3 месяца" }, { k: "1m", l: "1 месяц" }];
+  const [currentPlan] = useState("Free"); // текущий тариф из БД
+  const periods = [{ k: "1y", l: "1 год -12%" }, { k: "6m", l: "6 мес -6%" }, { k: "3m", l: "3 месяца" }, { k: "1m", l: "1 месяц" }];
   const multiplier = period === "1y" ? 0.88 : period === "6m" ? 0.94 : period === "3m" ? 1 : 1;
   const tariffs = [
     { name: "Free", base: 0, features: ["До 300 заявок в мес", "Книга резервов", "Виджет для сайта", "Уведомления SMS и TG", "Интеграция с Я.Еда"] },
     { name: "Mini", base: 2550, features: ["Заявки без ограничений", "Книга резервов и схема зала", "Форма бронирования", "Лист ожидания (очередь)", "Банкеты", "Уведомления гостям", "Сервисы аналитики"] },
-    { name: "PRO", base: 4310, features: ["Все из Mini, плюс:", "Депозиты на ваш р/с", "Звонки с облачными АТС", "Статистика заведения", "База гостей и черный список", "Полная история резервов"], highlighted: true },
+    { name: "PRO", base: 4310, popular: true, features: ["Все из Mini, плюс:", "Депозиты на ваш р/с", "Звонки с облачными АТС", "Статистика заведения", "База гостей и черный список", "Полная история резервов"] },
     { name: "PRO +", base: 5190, features: ["Все из PRO, плюс:", "Выключение лейбла", "Продажа билетов", "Сертификаты", "Промокоды на скидку", "Интеграции с POS: iiko, r_keeper", "Интеграции с CRM: Битрикс24", "API RESTObooking"] },
   ];
 
   return (
     <div style={{ padding: 32, maxWidth: 1000, margin: "0 auto" }}>
       <div style={{ padding: "16px 20px", background: "var(--color-bg-card)", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-sm)", marginBottom: 24, textAlign: "center" }}>
-        <p style={{ fontWeight: 500 }}>Тестовый период до 28.05.2026</p>
-        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Автоплатеж отключен</p>
+        <p style={{ fontWeight: 500 }}>Текущий тариф: <span style={{ color: "var(--color-primary)" }}>{currentPlan}</span></p>
+        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Тестовый период до 28.05.2026 | Автоплатеж отключен</p>
       </div>
       <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 24 }}>
         {periods.map((p) => (
@@ -298,26 +299,47 @@ function TariffsTab() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
         {tariffs.map((t) => {
           const price = t.base === 0 ? 0 : Math.round(t.base * multiplier);
+          const isCurrent = t.name === currentPlan;
+          const isPopular = "popular" in t && t.popular;
           return (
-            <div key={t.name} style={{ padding: 20, background: "var(--color-bg-card)", borderRadius: "var(--radius-md)", boxShadow: t.highlighted ? "var(--shadow-lg)" : "var(--shadow-sm)" }}>
-              <h3 style={{ fontSize: 18, fontWeight: 500, color: t.highlighted ? "var(--color-primary)" : "var(--color-text-primary)", marginBottom: 4 }}>{t.name}</h3>
+            <div key={t.name} style={{
+              padding: 20, background: "var(--color-bg-card)", borderRadius: "var(--radius-md)",
+              boxShadow: isPopular ? "var(--shadow-lg)" : "var(--shadow-sm)",
+              border: isPopular ? "2px solid var(--color-primary)" : isCurrent ? "2px solid var(--color-success)" : "2px solid transparent",
+              position: "relative",
+            }}>
+              {isPopular && (
+                <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "var(--color-primary)", color: "#fff", fontSize: 10, fontWeight: 500, padding: "2px 12px", borderRadius: 10, letterSpacing: "0.05em" }}>ПОПУЛЯРНЫЙ</div>
+              )}
+              {isCurrent && (
+                <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: "var(--color-success)", color: "#fff", fontSize: 10, fontWeight: 500, padding: "2px 12px", borderRadius: 10 }}>ТЕКУЩИЙ</div>
+              )}
+              <h3 style={{ fontSize: 18, fontWeight: 500, color: isPopular ? "var(--color-primary)" : "var(--color-text-primary)", marginBottom: 4, marginTop: isPopular || isCurrent ? 4 : 0 }}>{t.name}</h3>
               <div style={{ marginBottom: 12 }}>
                 <span style={{ fontSize: 22, fontWeight: 500 }}>{price === 0 ? "Бесплатно" : `${price.toLocaleString("ru")} руб`}</span>
                 {price > 0 && <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>/мес</span>}
               </div>
-              <ul style={{ listStyle: "none", padding: 0 }}>
+              <ul style={{ listStyle: "none", padding: 0, marginBottom: 16 }}>
                 {t.features.map((f) => (
                   <li key={f} style={{ fontSize: 12, color: "var(--color-text-secondary)", display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 5 }}>
                     <CheckCircle2 size={12} style={{ color: "var(--color-primary)", flexShrink: 0, marginTop: 2 }} />{f}
                   </li>
                 ))}
               </ul>
+              <button
+                className={isCurrent ? "btn btn-secondary btn-sm" : "btn btn-primary btn-sm"}
+                style={{ width: "100%", fontSize: 12 }}
+                disabled={isCurrent}
+                onClick={() => { if (!isCurrent) alert(`Для перехода на тариф "${t.name}" свяжитесь с нами: support@restobooking.ru`); }}
+              >
+                {isCurrent ? "Текущий план" : price === 0 ? "Начать бесплатно" : "Выбрать"}
+              </button>
             </div>
           );
         })}
       </div>
       <div style={{ marginTop: 20, padding: 16, background: "var(--color-bg-card)", borderRadius: "var(--radius-md)", textAlign: "center" }}>
-        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Оплата по карте или по счету (для юр. лиц и ИП) в своем личном кабинете</p>
+        <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>Оплата по карте или по счету (для юр. лиц и ИП). Вопросы: support@restobooking.ru</p>
       </div>
     </div>
   );
