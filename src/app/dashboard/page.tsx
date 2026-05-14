@@ -530,6 +530,11 @@ function SettingsTab() {
   const [section, setSection] = useState<"floor" | "widget" | "notifications">("floor");
   const trpc = useTRPC();
 
+  // Получаем slug ресторана для виджета
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const myRestQuery = useQuery(trpc.booking.myRestaurantBookings.queryOptions()) as { data: any };
+  const restaurantSlug = myRestQuery.data?.restaurant?.slug || "my-restaurant";
+
   // Загружаем столы из API
   const layoutQuery = useQuery(trpc.floor.getLayout.queryOptions({ hallId: undefined }));
   const saveLayoutMut = useMutation(
@@ -787,7 +792,7 @@ function SettingsTab() {
                 <div>
                   <label className="input-label">Код для встраивания</label>
                   <div style={{ padding: 12, background: "var(--color-bg-elevated)", borderRadius: "var(--radius-sm)", fontFamily: "monospace", fontSize: 11, color: "var(--color-text-secondary)", wordBreak: "break-all" }}>
-                    {`<script src="https://restobooking.ru/widget.js" data-restaurant="beluga" data-theme="${widgetTheme}" data-color="${widgetColor}"></script>`}
+                    {`<script src="https://restobooking.ru/widget.js" data-restaurant="${restaurantSlug}" data-theme="${widgetTheme}" data-color="${widgetColor}"></script>`}
                   </div>
                 </div>
               </div>
