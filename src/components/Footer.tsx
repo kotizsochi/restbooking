@@ -23,9 +23,9 @@ export function Footer() {
           </p>
         </div>
         {[
-          { title: "ГОСТЯМ", links: [{ text: "Рестораны", href: "/" }, { text: "Акции", href: "#" }, { text: "Приложение", href: "#" }] },
-          { title: "РЕСТОРАНАМ", links: [{ text: "Подключение", href: "/for-restaurants" }, { text: "Тарифы", href: "#" }, { text: "API", href: "#" }] },
-          { title: "КОМПАНИЯ", links: [{ text: "О нас", href: "#" }, { text: "Контакты", href: "#" }, { text: "Блог", href: "#" }] },
+          { title: "ГОСТЯМ", links: [{ text: "Рестораны", href: "/" }, { text: "Политика", href: "/privacy" }] },
+          { title: "РЕСТОРАНАМ", links: [{ text: "Подключение", href: "/for-restaurants" }, { text: "Тарифы", href: "/for-restaurants" }] },
+          { title: "КОМПАНИЯ", links: [{ text: "Контакты", href: "mailto:support@restobooking.ru" }, { text: "Конфиденциальность", href: "/privacy" }] },
         ].map((col) => (
           <div key={col.title}>
             <h4 style={{ fontSize: 11, fontWeight: 500, marginBottom: 12, color: "var(--color-text-muted)", letterSpacing: "0.1em" }}>{col.title}</h4>
