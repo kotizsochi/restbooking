@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { MOCK_RESTAURANTS, getAvailableSlots } from "@/lib/mock-data";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
 
 const CUISINE_LABELS: Record<string, string> = {
   RUSSIAN: "Русская", ITALIAN: "Итальянская", JAPANESE: "Японская",
@@ -148,7 +149,7 @@ export default function RestaurantPage() {
               </div>
 
               <p style={{ fontSize: 16, color: "var(--color-text-secondary)", lineHeight: 1.7, marginBottom: 24 }}>
-                {restaurant.description}
+                {(restaurant as Record<string, unknown>).description as string || restaurant.shortDesc}
               </p>
 
               {/* Features */}
@@ -322,7 +323,7 @@ export default function RestaurantPage() {
                   </div>
                   <div style={{ marginBottom: 16 }}>
                     <label className="input-label">Телефон</label>
-                    <input className="input-field" placeholder="+7 (999) 123-45-67" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} />
+                    <PhoneMaskedInput value={guestPhone} onChange={(v) => setGuestPhone(v)} />
                   </div>
                   <div style={{ marginBottom: 20 }}>
                     <label className="input-label">Пожелания (необязательно)</label>

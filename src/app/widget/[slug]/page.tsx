@@ -140,7 +140,19 @@ function BookingForm({ table, timeFrom, onClose }: { table: TableInfo; timeFrom:
         {table.deposit > 0 && <div style={{ padding: "8px 12px", background: "rgba(146,117,85,0.08)", borderRadius: 6, fontSize: 13, color: "#927555", marginBottom: 16 }}>Депозит: {table.deposit.toLocaleString("ru")} руб.</div>}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <input placeholder="Ваше имя *" value={name} onChange={(e) => setName(e.target.value)} style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 14, outline: "none" }} />
-          <input placeholder="Телефон *" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 14, outline: "none" }} />
+          <input placeholder="+7 (___) ___-__-__" type="tel" value={phone || "+7"} onChange={(e) => {
+            const raw = e.target.value;
+            if (raw.length < 3) { setPhone("+7"); return; }
+            const digits = raw.replace(/\D/g, "");
+            const d = digits.startsWith("7") ? digits : "7" + digits;
+            let r = "+7";
+            if (d.length > 1) r += " (" + d.slice(1, 4);
+            if (d.length >= 4) r += ")";
+            if (d.length > 4) r += " " + d.slice(4, 7);
+            if (d.length > 7) r += "-" + d.slice(7, 9);
+            if (d.length > 9) r += "-" + d.slice(9, 11);
+            setPhone(r);
+          }} maxLength={18} style={{ padding: "10px 12px", borderRadius: 8, border: "1px solid #e0e0e0", fontSize: 14, outline: "none" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 13, color: "#666" }}>Гостей:</span>
             <button onClick={() => setGuests(Math.max(1, guests - 1))} style={{ width: 28, height: 28, borderRadius: "50%", border: "1px solid #ddd", background: "#fff", cursor: "pointer", fontSize: 16 }}>-</button>

@@ -7,6 +7,7 @@ import {
   ArrowRight, ArrowLeft, CheckCircle2, Globe,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PhoneMaskedInput } from "@/components/PhoneMaskedInput";
 
 const FEATURES = [
   { icon: BookOpen, title: "Электронная книга резервов", desc: "Все бронирования в реальном времени с автообновлением.", details: ["Календарь на день/неделю/месяц", "Статусы броней", "История визитов гостя"] },
@@ -70,7 +71,7 @@ function RegistrationForm() {
           <div><label className="input-label">Ваше имя *</label><input className="input-field" placeholder="Иван Иванов" value={form.ownerName} onChange={(e) => update("ownerName", e.target.value)} /></div>
           <div><label className="input-label">E-mail *</label><input className="input-field" type="email" placeholder="info@restaurant.ru" value={form.email} onChange={(e) => update("email", e.target.value)} /></div>
           <div><label className="input-label">Пароль *</label><input className="input-field" type="password" placeholder="Минимум 8 символов" value={form.password} onChange={(e) => update("password", e.target.value)} /></div>
-          <div><label className="input-label">Телефон *</label><input className="input-field" type="tel" placeholder="+7 (999) 123-45-67" value={form.phone} onChange={(e) => update("phone", e.target.value)} /></div>
+          <div><label className="input-label">Телефон *</label><PhoneMaskedInput value={form.phone} onChange={(v) => update("phone", v)} /></div>
         </div>
         <label style={{ display: "flex", gap: 8, fontSize: 13, color: "var(--color-text-secondary)", cursor: "pointer", marginTop: 16, alignItems: "flex-start" }}>
           <input type="checkbox" checked={form.agreed} onChange={(e) => update("agreed", e.target.checked)} style={{ marginTop: 2, accentColor: "var(--color-primary)" }} />
@@ -89,7 +90,7 @@ function RegistrationForm() {
           <div><label className="input-label">Название заведения *</label><input className="input-field" placeholder="Белуга" value={form.restaurantName} onChange={(e) => update("restaurantName", e.target.value)} /></div>
           <div><label className="input-label">Город заведения *</label><input className="input-field" placeholder="Москва" value={form.city} onChange={(e) => update("city", e.target.value)} /></div>
           <div><label className="input-label">Адрес заведения (улица, дом) *</label><input className="input-field" placeholder="ул. Тверская, 15" value={form.address} onChange={(e) => update("address", e.target.value)} /></div>
-          <div><label className="input-label">Телефон заведения *</label><input className="input-field" type="tel" placeholder="+7 (495) 000-00-00" value={form.restaurantPhone} onChange={(e) => update("restaurantPhone", e.target.value)} /></div>
+          <div><label className="input-label">Телефон заведения *</label><PhoneMaskedInput value={form.restaurantPhone} onChange={(v) => update("restaurantPhone", v)} /></div>
         </div>
         <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
           <button className="btn btn-secondary" style={{ flex: 1, gap: 6 }} onClick={() => setStep(1)}><ArrowLeft size={14} /> Назад</button>
