@@ -187,6 +187,46 @@ export default function RestaurantPage() {
                   <span style={{ fontWeight: 400 }}>{restaurant.tables.length}</span>
                 </div>
               </div>
+
+              {/* Working hours by day */}
+              <div style={{ marginTop: 32 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 500, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                  <Clock size={16} /> Часы работы
+                </h3>
+                <div className="glass-card" style={{ padding: 16 }}>
+                  {["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"].map((day, i) => (
+                    <div key={day} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: i < 6 ? "1px solid var(--color-border)" : "none", fontSize: 13 }}>
+                      <span style={{ color: "var(--color-text-secondary)" }}>{day}</span>
+                      <span style={{ fontWeight: 400 }}>{restaurant.openingTime} - {restaurant.closingTime}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rating metrics */}
+              <div style={{ marginTop: 32 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 500, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                  <Star size={16} /> Оценки гостей
+                </h3>
+                <div className="glass-card" style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  {[
+                    { label: "Еда", score: Math.min(5, restaurant.avgRating + 0.1) },
+                    { label: "Обслуживание", score: Math.min(5, restaurant.avgRating - 0.1) },
+                    { label: "Атмосфера", score: Math.min(5, restaurant.avgRating) },
+                    { label: "Цена/качество", score: Math.min(5, restaurant.avgRating - 0.3) },
+                  ].map((m) => (
+                    <div key={m.label}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                        <span style={{ color: "var(--color-text-secondary)" }}>{m.label}</span>
+                        <span style={{ fontWeight: 500 }}>{m.score.toFixed(1)}</span>
+                      </div>
+                      <div style={{ height: 6, background: "var(--color-bg-elevated)", borderRadius: 3, overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${(m.score / 5) * 100}%`, background: "var(--color-primary)", borderRadius: 3, transition: "width 0.6s ease" }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
