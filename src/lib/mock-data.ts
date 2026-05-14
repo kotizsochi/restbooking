@@ -1,214 +1,58 @@
 export const MOCK_RESTAURANTS = [
-  {
-    id: "rest_1",
-    name: "Белуга",
-    slug: "beluga",
-    shortDesc: "Высокая русская кухня с видом на город",
-    description:
-      "Ресторан Белуга - это утонченная русская кухня, авторские коктейли и панорамный вид на центр Москвы. Шеф-повар создает блюда из лучших российских продуктов.",
-    cuisine: ["RUSSIAN", "SEAFOOD"],
-    priceRange: "LUXURY",
-    city: "Москва",
-    address: "ул. Тверская, 15",
-    avgRating: 4.8,
-    reviewCount: 342,
-    openingTime: "12:00",
-    closingTime: "00:00",
-    features: ["vip", "terrace", "live_music", "parking"],
-    coverImage: "/images/restaurants/beluga.jpg",
-    depositRequired: true,
-    depositAmount: 2000,
-    maxPartySize: 10,
-    tables: [
-      { id: "t1", label: "1", minCapacity: 2, maxCapacity: 2, tableType: "STANDARD" },
-      { id: "t2", label: "2", minCapacity: 2, maxCapacity: 4, tableType: "STANDARD" },
-      { id: "t3", label: "3", minCapacity: 4, maxCapacity: 6, tableType: "STANDARD" },
-      { id: "t4", label: "VIP-1", minCapacity: 2, maxCapacity: 8, tableType: "VIP" },
-      { id: "t5", label: "T-1", minCapacity: 2, maxCapacity: 4, tableType: "TERRACE" },
-      { id: "t6", label: "T-2", minCapacity: 4, maxCapacity: 6, tableType: "TERRACE" },
-      { id: "t7", label: "B-1", minCapacity: 1, maxCapacity: 2, tableType: "BAR" },
-    ],
-  },
-  {
-    id: "rest_2",
-    name: "Sakura Garden",
-    slug: "sakura-garden",
-    shortDesc: "Аутентичная японская кухня и омакасе",
-    description:
-      "Sakura Garden - изысканный японский ресторан с мастерами суши из Токио. Омакасе-сеты, свежайшие морепродукты и традиционные сакэ.",
-    cuisine: ["JAPANESE"],
-    priceRange: "PREMIUM",
-    city: "Москва",
-    address: "Пресненская наб., 8",
-    avgRating: 4.6,
-    reviewCount: 218,
-    openingTime: "11:00",
-    closingTime: "23:00",
-    features: ["private_room", "sushi_bar", "sake_collection"],
-    coverImage: "/images/restaurants/sakura.jpg",
-    depositRequired: true,
-    depositAmount: 1500,
-    maxPartySize: 8,
-    tables: [
-      { id: "t8", label: "1", minCapacity: 2, maxCapacity: 2, tableType: "STANDARD" },
-      { id: "t9", label: "2", minCapacity: 2, maxCapacity: 4, tableType: "STANDARD" },
-      { id: "t10", label: "Сушичная", minCapacity: 1, maxCapacity: 2, tableType: "BAR" },
-      { id: "t11", label: "Private", minCapacity: 4, maxCapacity: 8, tableType: "PRIVATE" },
-    ],
-  },
-  {
-    id: "rest_3",
-    name: "Хинкальная Дед",
-    slug: "hinkalnaya-ded",
-    shortDesc: "Настоящая грузинская кухня и домашнее вино",
-    description:
-      "Хинкальная Дед - уютное место с аутентичной грузинской кухней. Хинкали ручной лепки, хачапури по-аджарски и домашнее вино из Кахетии.",
-    cuisine: ["GEORGIAN"],
-    priceRange: "MODERATE",
-    city: "Москва",
-    address: "ул. Покровка, 28",
-    avgRating: 4.5,
-    reviewCount: 567,
-    openingTime: "10:00",
-    closingTime: "23:00",
-    features: ["family_friendly", "terrace", "group_events"],
-    coverImage: "/images/restaurants/georgian.jpg",
-    depositRequired: false,
-    maxPartySize: 20,
-    tables: [
-      { id: "t12", label: "1", minCapacity: 2, maxCapacity: 4, tableType: "STANDARD" },
-      { id: "t13", label: "2", minCapacity: 2, maxCapacity: 4, tableType: "STANDARD" },
-      { id: "t14", label: "3", minCapacity: 4, maxCapacity: 6, tableType: "STANDARD" },
-      { id: "t15", label: "4", minCapacity: 4, maxCapacity: 6, tableType: "STANDARD" },
-      { id: "t16", label: "Большой", minCapacity: 8, maxCapacity: 20, tableType: "PRIVATE" },
-      { id: "t17", label: "Терраса-1", minCapacity: 2, maxCapacity: 4, tableType: "TERRACE" },
-    ],
-  },
-  {
-    id: "rest_4",
-    name: "La Piazza",
-    slug: "la-piazza",
-    shortDesc: "Итальянская траттория в сердце Петербурга",
-    description:
-      "La Piazza - настоящая итальянская траттория. Паста ручной работы, пицца из дровяной печи и вина из лучших виноделен Италии.",
-    cuisine: ["ITALIAN"],
-    priceRange: "MODERATE",
-    city: "Санкт-Петербург",
-    address: "Невский пр., 44",
-    avgRating: 4.4,
-    reviewCount: 445,
-    openingTime: "11:00",
-    closingTime: "23:00",
-    features: ["outdoor_seating", "wine_list", "live_music"],
-    coverImage: "/images/restaurants/italian.jpg",
-    depositRequired: false,
-    maxPartySize: 10,
-    tables: [
-      { id: "t18", label: "1", minCapacity: 2, maxCapacity: 2, tableType: "STANDARD" },
-      { id: "t19", label: "2", minCapacity: 2, maxCapacity: 4, tableType: "STANDARD" },
-      { id: "t20", label: "3", minCapacity: 4, maxCapacity: 6, tableType: "STANDARD" },
-      { id: "t21", label: "Терраса", minCapacity: 2, maxCapacity: 4, tableType: "TERRACE" },
-    ],
-  },
-  {
-    id: "rest_5",
-    name: "Chef's Table",
-    slug: "chefs-table",
-    shortDesc: "Авторская кухня и гастрономические впечатления",
-    description:
-      "Chef's Table - ресторан авторской кухни от шеф-повара с мишленовским опытом. Сезонное дегустационное меню, уникальная подача и атмосфера.",
-    cuisine: ["FUSION", "FRENCH"],
-    priceRange: "LUXURY",
-    city: "Москва",
-    address: "Патриаршие пруды, Малый Козихинский пер., 7",
-    avgRating: 4.9,
-    reviewCount: 128,
-    openingTime: "18:00",
-    closingTime: "00:00",
-    features: ["tasting_menu", "wine_pairing", "private_events", "vip"],
-    coverImage: "/images/restaurants/chefs-table.jpg",
-    depositRequired: true,
-    depositAmount: 5000,
-    maxPartySize: 6,
-    tables: [
-      { id: "t22", label: "1", minCapacity: 2, maxCapacity: 2, tableType: "VIP" },
-      { id: "t23", label: "2", minCapacity: 2, maxCapacity: 4, tableType: "VIP" },
-      { id: "t24", label: "Chef's Bar", minCapacity: 1, maxCapacity: 2, tableType: "BAR" },
-      { id: "t25", label: "Private", minCapacity: 4, maxCapacity: 6, tableType: "PRIVATE" },
-    ],
-  },
-  {
-    id: "rest_6",
-    name: "Мясо & Рыба",
-    slug: "myaso-i-ryba",
-    shortDesc: "Стейки на гриле и свежие морепродукты",
-    description:
-      "Мясо & Рыба - ресторан для ценителей стейков и морепродуктов. Мраморная говядина, устрицы, крабы и фирменные соусы.",
-    cuisine: ["STEAKHOUSE", "SEAFOOD"],
-    priceRange: "PREMIUM",
-    city: "Сочи",
-    address: "Курортный пр., 12",
-    avgRating: 4.3,
-    reviewCount: 289,
-    openingTime: "12:00",
-    closingTime: "23:00",
-    features: ["sea_view", "terrace", "wine_cellar", "parking"],
-    coverImage: "/images/restaurants/steak.jpg",
-    depositRequired: true,
-    depositAmount: 1000,
-    maxPartySize: 12,
-    tables: [
-      { id: "t26", label: "1", minCapacity: 2, maxCapacity: 2, tableType: "STANDARD" },
-      { id: "t27", label: "2", minCapacity: 2, maxCapacity: 4, tableType: "STANDARD" },
-      { id: "t28", label: "3", minCapacity: 4, maxCapacity: 6, tableType: "STANDARD" },
-      { id: "t29", label: "Видовой", minCapacity: 2, maxCapacity: 4, tableType: "TERRACE" },
-      { id: "t30", label: "VIP", minCapacity: 4, maxCapacity: 12, tableType: "VIP" },
-    ],
-  },
+  { id: "r1", name: "White Rabbit", slug: "white-rabbit", shortDesc: "Ресторан высокой русской кухни с панорамным видом", cuisine: ["RUSSIAN","FUSION"], priceRange: "LUXURY", city: "Москва", address: "Смоленская пл., 3, 16-й этаж", avgRating: 4.8, reviewCount: 2847, openingTime: "12:00", closingTime: "00:00", features: ["vip","terrace","parking"], coverImage: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=75", depositRequired: true, depositAmount: 5000, maxPartySize: 10, tables: [{id:"t1",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"},{id:"t2",label:"VIP",minCapacity:2,maxCapacity:8,tableType:"VIP"}] },
+  { id: "r2", name: "Selfie", slug: "selfie", shortDesc: "Авторская кухня Анатолия Казакова", cuisine: ["RUSSIAN","FUSION"], priceRange: "LUXURY", city: "Москва", address: "Новинский бул., 31", avgRating: 4.7, reviewCount: 1923, openingTime: "12:00", closingTime: "00:00", features: ["vip","private_room"], coverImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=75", depositRequired: true, depositAmount: 3000, maxPartySize: 8, tables: [{id:"t3",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r3", name: "Twins Garden", slug: "twins-garden", shortDesc: "Гастрономический ресторан братьев Березуцких", cuisine: ["RUSSIAN","FUSION"], priceRange: "LUXURY", city: "Москва", address: "Страстной бул., 8а", avgRating: 4.9, reviewCount: 1456, openingTime: "18:00", closingTime: "00:00", features: ["tasting_menu","wine_pairing","vip"], coverImage: "https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=600&q=75", depositRequired: true, depositAmount: 7000, maxPartySize: 6, tables: [{id:"t4",label:"1",minCapacity:2,maxCapacity:4,tableType:"VIP"}] },
+  { id: "r4", name: "Белуга", slug: "beluga", shortDesc: "Легендарный ресторан русской кухни", cuisine: ["RUSSIAN","SEAFOOD"], priceRange: "LUXURY", city: "Москва", address: "ул. Тверская, 15", avgRating: 4.8, reviewCount: 2134, openingTime: "12:00", closingTime: "00:00", features: ["vip","terrace","live_music","parking"], coverImage: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=75", depositRequired: true, depositAmount: 3000, maxPartySize: 10, tables: [{id:"t5",label:"1",minCapacity:2,maxCapacity:2,tableType:"STANDARD"},{id:"t6",label:"VIP-1",minCapacity:2,maxCapacity:8,tableType:"VIP"}] },
+  { id: "r5", name: "Пушкинъ", slug: "pushkin", shortDesc: "Классика русской кухни в интерьере XIX века", cuisine: ["RUSSIAN"], priceRange: "PREMIUM", city: "Москва", address: "Тверской бул., 26а", avgRating: 4.6, reviewCount: 4521, openingTime: "12:00", closingTime: "00:00", features: ["vip","parking","live_music"], coverImage: "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=600&q=75", depositRequired: true, depositAmount: 2000, maxPartySize: 12, tables: [{id:"t7",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r6", name: "Сахалин", slug: "sakhalin", shortDesc: "Лучшие морепродукты Дальнего Востока", cuisine: ["SEAFOOD","RUSSIAN"], priceRange: "LUXURY", city: "Москва", address: "Смоленская пл., 3", avgRating: 4.7, reviewCount: 1876, openingTime: "12:00", closingTime: "00:00", features: ["vip","private_room"], coverImage: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=75", depositRequired: true, depositAmount: 3000, maxPartySize: 8, tables: [{id:"t8",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r7", name: "Турандот", slug: "turandot", shortDesc: "Роскошный ресторан в стиле барокко", cuisine: ["FUSION","CHINESE","JAPANESE"], priceRange: "LUXURY", city: "Москва", address: "Тверской бул., 26", avgRating: 4.5, reviewCount: 3245, openingTime: "12:00", closingTime: "00:00", features: ["vip","parking","live_music","private_room"], coverImage: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=600&q=75", depositRequired: true, depositAmount: 5000, maxPartySize: 12, tables: [{id:"t9",label:"1",minCapacity:2,maxCapacity:6,tableType:"STANDARD"}] },
+  { id: "r8", name: "Бараshka", slug: "barashka", shortDesc: "Азербайджанская кухня на Патриарших", cuisine: ["GEORGIAN"], priceRange: "PREMIUM", city: "Москва", address: "Спиридоньевский пер., 12/9", avgRating: 4.6, reviewCount: 2156, openingTime: "12:00", closingTime: "00:00", features: ["terrace","private_room"], coverImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=75", depositRequired: false, maxPartySize: 10, tables: [{id:"t10",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r9", name: "Рыбы нет", slug: "ryby-net", shortDesc: "Современная рыбная гастрономия", cuisine: ["SEAFOOD","FUSION"], priceRange: "PREMIUM", city: "Москва", address: "ул. Верхняя Красносельская, 3а", avgRating: 4.5, reviewCount: 987, openingTime: "12:00", closingTime: "23:00", features: ["terrace"], coverImage: "https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=600&q=75", depositRequired: false, maxPartySize: 8, tables: [{id:"t11",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r10", name: "Кафе Пушкинъ", slug: "cafe-pushkin", shortDesc: "Кондитерская с легендарными десертами", cuisine: ["RUSSIAN","FRENCH"], priceRange: "PREMIUM", city: "Москва", address: "Тверской бул., 26а", avgRating: 4.4, reviewCount: 3876, openingTime: "08:00", closingTime: "23:00", features: ["terrace","family_friendly"], coverImage: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&q=75", depositRequired: false, maxPartySize: 6, tables: [{id:"t12",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r11", name: "Честная кухня", slug: "chestnaya-kuhnya", shortDesc: "Фермерские продукты, сезонное меню", cuisine: ["RUSSIAN"], priceRange: "MODERATE", city: "Москва", address: "Садовая-Черногрязская, 10", avgRating: 4.5, reviewCount: 1234, openingTime: "10:00", closingTime: "23:00", features: ["family_friendly","terrace"], coverImage: "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=600&q=75", depositRequired: false, maxPartySize: 8, tables: [{id:"t13",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r12", name: "Nobu Moscow", slug: "nobu-moscow", shortDesc: "Японская кухня с перуанскими мотивами", cuisine: ["JAPANESE","FUSION"], priceRange: "LUXURY", city: "Москва", address: "Б. Дмитровка, 20/5", avgRating: 4.6, reviewCount: 1567, openingTime: "12:00", closingTime: "00:00", features: ["vip","sushi_bar","sake_collection"], coverImage: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&q=75", depositRequired: true, depositAmount: 4000, maxPartySize: 8, tables: [{id:"t14",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r13", name: "Сыроварня", slug: "syrovarnya", shortDesc: "Итальянская кухня с собственной сыроварней", cuisine: ["ITALIAN"], priceRange: "MODERATE", city: "Москва", address: "Бадаевский завод, 2", avgRating: 4.3, reviewCount: 2876, openingTime: "10:00", closingTime: "00:00", features: ["terrace","family_friendly","parking"], coverImage: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=75", depositRequired: false, maxPartySize: 10, tables: [{id:"t15",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r14", name: "Северяне", slug: "severyane", shortDesc: "Северная кухня с открытым огнем", cuisine: ["RUSSIAN","FUSION"], priceRange: "PREMIUM", city: "Москва", address: "Б. Никитская, 12", avgRating: 4.7, reviewCount: 876, openingTime: "12:00", closingTime: "00:00", features: ["vip","wine_list"], coverImage: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&q=75", depositRequired: true, depositAmount: 2000, maxPartySize: 6, tables: [{id:"t16",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r15", name: "Москва-Сити 354", slug: "354-exclusive", shortDesc: "Высотный ресторан на 86-м этаже", cuisine: ["FUSION","FRENCH"], priceRange: "LUXURY", city: "Москва", address: "Пресненская наб., 12, 86 этаж", avgRating: 4.5, reviewCount: 1654, openingTime: "12:00", closingTime: "02:00", features: ["vip","terrace","parking","live_music"], coverImage: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=600&q=75", depositRequired: true, depositAmount: 5000, maxPartySize: 8, tables: [{id:"t17",label:"1",minCapacity:2,maxCapacity:4,tableType:"VIP"}] },
+  { id: "r16", name: "Хинкальная", slug: "hinkalnaya", shortDesc: "Грузинская кухня с хинкали ручной лепки", cuisine: ["GEORGIAN"], priceRange: "BUDGET", city: "Москва", address: "ул. Покровка, 28", avgRating: 4.4, reviewCount: 3456, openingTime: "10:00", closingTime: "23:00", features: ["family_friendly","group_events"], coverImage: "https://images.unsplash.com/photo-1515669097368-22e68427d265?w=600&q=75", depositRequired: false, maxPartySize: 20, tables: [{id:"t18",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r17", name: "Недальний Восток", slug: "nedalniy-vostok", shortDesc: "Паназиатская кухня в центре Москвы", cuisine: ["CHINESE","JAPANESE","FUSION"], priceRange: "PREMIUM", city: "Москва", address: "Тверской бул., 15", avgRating: 4.4, reviewCount: 2134, openingTime: "12:00", closingTime: "00:00", features: ["private_room","sushi_bar"], coverImage: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=75", depositRequired: true, depositAmount: 2000, maxPartySize: 10, tables: [{id:"t19",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r18", name: "Рыба мечты", slug: "ryba-mechty", shortDesc: "Средиземноморские морепродукты", cuisine: ["SEAFOOD","ITALIAN"], priceRange: "PREMIUM", city: "Москва", address: "ул. Новый Арбат, 36", avgRating: 4.3, reviewCount: 1567, openingTime: "12:00", closingTime: "00:00", features: ["terrace","wine_list"], coverImage: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=600&q=75", depositRequired: false, maxPartySize: 8, tables: [{id:"t20",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r19", name: "Uhvat", slug: "uhvat", shortDesc: "Русская печь и фермерские продукты", cuisine: ["RUSSIAN"], priceRange: "PREMIUM", city: "Москва", address: "Пречистенка, 10/2", avgRating: 4.6, reviewCount: 654, openingTime: "12:00", closingTime: "23:00", features: ["private_room"], coverImage: "https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=600&q=75", depositRequired: true, depositAmount: 1500, maxPartySize: 8, tables: [{id:"t21",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r20", name: "Мясо & Рыба", slug: "myaso-ryba", shortDesc: "Стейки на гриле и свежие устрицы", cuisine: ["STEAKHOUSE","SEAFOOD"], priceRange: "PREMIUM", city: "Москва", address: "ул. Остоженка, 1", avgRating: 4.3, reviewCount: 2345, openingTime: "12:00", closingTime: "00:00", features: ["terrace","wine_cellar","parking"], coverImage: "https://images.unsplash.com/photo-1558030006-450675393462?w=600&q=75", depositRequired: true, depositAmount: 1000, maxPartySize: 12, tables: [{id:"t22",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r21", name: "Горыныч", slug: "gorynych", shortDesc: "Русская печь и живой огонь на Патриках", cuisine: ["RUSSIAN","FUSION"], priceRange: "PREMIUM", city: "Москва", address: "Спиридоньевский пер., 9/1", avgRating: 4.4, reviewCount: 1876, openingTime: "12:00", closingTime: "00:00", features: ["terrace","live_music"], coverImage: "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=600&q=75", depositRequired: false, maxPartySize: 8, tables: [{id:"t23",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r22", name: "Erwin", slug: "erwin", shortDesc: "Речная рыба и устрицы в лофте", cuisine: ["SEAFOOD","RUSSIAN"], priceRange: "PREMIUM", city: "Москва", address: "Кутузовский пр., 2/1", avgRating: 4.5, reviewCount: 1345, openingTime: "12:00", closingTime: "00:00", features: ["terrace","wine_list"], coverImage: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=600&q=75", depositRequired: false, maxPartySize: 8, tables: [{id:"t24",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r23", name: "Pinch", slug: "pinch", shortDesc: "Современная российская кухня", cuisine: ["RUSSIAN","FUSION"], priceRange: "PREMIUM", city: "Москва", address: "Б. Грузинская, 69", avgRating: 4.7, reviewCount: 567, openingTime: "12:00", closingTime: "00:00", features: ["tasting_menu","wine_pairing"], coverImage: "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&q=75", depositRequired: true, depositAmount: 3000, maxPartySize: 6, tables: [{id:"t25",label:"1",minCapacity:2,maxCapacity:4,tableType:"VIP"}] },
+  { id: "r24", name: "La Maree", slug: "la-maree", shortDesc: "Французская кухня с морепродуктами", cuisine: ["FRENCH","SEAFOOD"], priceRange: "LUXURY", city: "Москва", address: "ул. Петровка, 28/2", avgRating: 4.5, reviewCount: 1987, openingTime: "12:00", closingTime: "00:00", features: ["vip","wine_cellar","private_room"], coverImage: "https://images.unsplash.com/photo-1551218808-94e220e084d2?w=600&q=75", depositRequired: true, depositAmount: 3000, maxPartySize: 10, tables: [{id:"t26",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r25", name: "Хлеб Насущный", slug: "hleb-nasushny", shortDesc: "Пекарня и ресторан с утренними завтраками", cuisine: ["RUSSIAN","FRENCH"], priceRange: "MODERATE", city: "Москва", address: "ул. Мясницкая, 22/1", avgRating: 4.2, reviewCount: 2345, openingTime: "08:00", closingTime: "22:00", features: ["family_friendly"], coverImage: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=75", depositRequired: false, maxPartySize: 6, tables: [{id:"t27",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r26", name: "Bjorn", slug: "bjorn", shortDesc: "Скандинавская кухня от шефа Никиты Подерягина", cuisine: ["FUSION"], priceRange: "PREMIUM", city: "Москва", address: "Пятницкая, 3", avgRating: 4.8, reviewCount: 432, openingTime: "12:00", closingTime: "00:00", features: ["tasting_menu","wine_pairing"], coverImage: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=75", depositRequired: true, depositAmount: 3000, maxPartySize: 6, tables: [{id:"t28",label:"1",minCapacity:2,maxCapacity:4,tableType:"VIP"}] },
+  { id: "r27", name: "Техникум", slug: "tehnikum", shortDesc: "Гастрономический бар на Патриках", cuisine: ["FUSION","AMERICAN"], priceRange: "MODERATE", city: "Москва", address: "Спиридоньевский пер., 9", avgRating: 4.3, reviewCount: 876, openingTime: "18:00", closingTime: "02:00", features: ["live_music"], coverImage: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&q=75", depositRequired: false, maxPartySize: 6, tables: [{id:"t29",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r28", name: "AQ Kitchen", slug: "aq-kitchen", shortDesc: "Авторская кухня Адриана Кетгласа", cuisine: ["FUSION","FRENCH"], priceRange: "PREMIUM", city: "Москва", address: "ул. Б. Грузинская, 69", avgRating: 4.6, reviewCount: 765, openingTime: "12:00", closingTime: "00:00", features: ["tasting_menu","wine_list"], coverImage: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=600&q=75", depositRequired: true, depositAmount: 2000, maxPartySize: 8, tables: [{id:"t30",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r29", name: "Матрёшка", slug: "matryoshka", shortDesc: "Русская кухня в современной интерпретации", cuisine: ["RUSSIAN"], priceRange: "PREMIUM", city: "Москва", address: "Кутузовский пр., 2/1", avgRating: 4.4, reviewCount: 1234, openingTime: "12:00", closingTime: "00:00", features: ["private_room","parking"], coverImage: "https://images.unsplash.com/photo-1543353071-10c8ba85a904?w=600&q=75", depositRequired: false, maxPartySize: 10, tables: [{id:"t31",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r30", name: "La Piazza", slug: "la-piazza", shortDesc: "Итальянская траттория в центре", cuisine: ["ITALIAN"], priceRange: "MODERATE", city: "Санкт-Петербург", address: "Невский пр., 44", avgRating: 4.4, reviewCount: 2345, openingTime: "11:00", closingTime: "23:00", features: ["outdoor_seating","wine_list","live_music"], coverImage: "https://images.unsplash.com/photo-1567521464027-f127ff144326?w=600&q=75", depositRequired: false, maxPartySize: 10, tables: [{id:"t32",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r31", name: "Каре", slug: "kare-spb", shortDesc: "Стейки и мясо на углях", cuisine: ["STEAKHOUSE"], priceRange: "PREMIUM", city: "Санкт-Петербург", address: "Гороховая ул., 14", avgRating: 4.5, reviewCount: 987, openingTime: "12:00", closingTime: "00:00", features: ["wine_cellar"], coverImage: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&q=75", depositRequired: true, depositAmount: 1500, maxPartySize: 8, tables: [{id:"t33",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r32", name: "Краб Хаус", slug: "krab-haus", shortDesc: "Крабы и морепродукты Черного моря", cuisine: ["SEAFOOD"], priceRange: "PREMIUM", city: "Сочи", address: "Курортный пр., 12", avgRating: 4.3, reviewCount: 1567, openingTime: "12:00", closingTime: "23:00", features: ["sea_view","terrace","parking"], coverImage: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=75", depositRequired: true, depositAmount: 1000, maxPartySize: 12, tables: [{id:"t34",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
+  { id: "r33", name: "Винотека 3/9", slug: "vinoteka-39", shortDesc: "Винный бар с авторскими закусками", cuisine: ["FUSION","FRENCH"], priceRange: "MODERATE", city: "Сочи", address: "ул. Навагинская, 7", avgRating: 4.6, reviewCount: 654, openingTime: "16:00", closingTime: "02:00", features: ["wine_list","live_music"], coverImage: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=75", depositRequired: false, maxPartySize: 6, tables: [{id:"t35",label:"1",minCapacity:2,maxCapacity:4,tableType:"STANDARD"}] },
 ];
 
-export function getAvailableSlots(
-  restaurantId: string,
-  date: string,
-  guestCount: number
-) {
+export function getAvailableSlots(restaurantId: string, date: string, guestCount: number) {
   const restaurant = MOCK_RESTAURANTS.find((r) => r.id === restaurantId);
   if (!restaurant) return [];
-
-  const suitableTables = restaurant.tables.filter(
-    (t) => t.minCapacity <= guestCount && t.maxCapacity >= guestCount
-  );
-
+  const suitableTables = restaurant.tables.filter((t) => t.minCapacity <= guestCount && t.maxCapacity >= guestCount);
   if (suitableTables.length === 0) return [];
-
   const [openH] = restaurant.openingTime.split(":").map(Number);
   const [closeH] = restaurant.closingTime.split(":").map(Number);
   const adjustedCloseH = closeH === 0 ? 24 : closeH;
-
-  const slots: {
-    time: string;
-    tables: typeof suitableTables;
-    isPeak: boolean;
-  }[] = [];
-
+  const slots: { time: string; tables: typeof suitableTables; isPeak: boolean }[] = [];
   for (let h = openH; h < adjustedCloseH - 1; h++) {
     for (const m of [0, 30]) {
       const timeStr = `${String(h % 24).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
       const isPeak = h >= 18 && h <= 21;
-
-      // Mock: некоторые слоты заняты (рандомно, но детерминированно по дате)
       const dateHash = date.split("-").reduce((a, b) => a + parseInt(b), 0);
       const slotHash = (dateHash + h * 60 + m) % 7;
-      const availableTables = suitableTables.filter(
-        (_, i) => (slotHash + i) % 3 !== 0
-      );
-
-      if (availableTables.length > 0) {
-        slots.push({ time: timeStr, tables: availableTables, isPeak });
-      }
+      const availableTables = suitableTables.filter((_, i) => (slotHash + i) % 3 !== 0);
+      if (availableTables.length > 0) slots.push({ time: timeStr, tables: availableTables, isPeak });
     }
   }
-
   return slots;
 }
 

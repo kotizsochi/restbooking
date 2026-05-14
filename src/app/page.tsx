@@ -88,17 +88,31 @@ function HeroSection({ onSearch }: { onSearch: (city: string) => void }) {
   });
 
   return (
-    <section style={{ padding: "clamp(40px, 8vw, 80px) 0 clamp(30px, 5vw, 60px)", textAlign: "center" }}>
-      <div className="container">
+    <section style={{ position: "relative", padding: "clamp(60px, 12vw, 120px) 0 clamp(40px, 8vw, 80px)", textAlign: "center", overflow: "hidden" }}>
+      {/* Video Background */}
+      <video autoPlay muted loop playsInline style={{
+        position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+        objectFit: "cover", zIndex: 0,
+      }}>
+        <source src="/hero-bg.mp4" type="video/mp4" />
+      </video>
+      {/* Dark overlay */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+        background: "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 100%)",
+        zIndex: 1,
+      }} />
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <h1 className="font-display animate-fade-in" style={{
           fontSize: "clamp(28px, 5vw, 56px)", fontWeight: 500,
-          marginBottom: 16, lineHeight: 1.05,
+          marginBottom: 16, lineHeight: 1.05, color: "#fff",
         }}>
           Забронируйте столик<br />
           <span style={{ color: "var(--color-primary)" }}>в лучших ресторанах</span>
         </h1>
         <p className="animate-fade-in" style={{
-          fontSize: "clamp(14px, 2vw, 18px)", color: "var(--color-text-secondary)",
+          fontSize: "clamp(14px, 2vw, 18px)", color: "rgba(255,255,255,0.7)",
           maxWidth: 500, margin: "0 auto 32px", animationDelay: "0.1s",
         }}>
           Реальная доступность, мгновенное подтверждение, интеграция с CRM ресторанов
@@ -107,21 +121,23 @@ function HeroSection({ onSearch }: { onSearch: (city: string) => void }) {
         <div className="glass-card animate-slide-up" style={{
           display: "flex", gap: 12, padding: "clamp(12px, 2vw, 16px)",
           maxWidth: 720, margin: "0 auto", flexWrap: "wrap", animationDelay: "0.2s",
+          background: "rgba(255,255,255,0.12)", backdropFilter: "blur(16px)",
+          border: "1px solid rgba(255,255,255,0.15)",
         }}>
           <div style={{ flex: "1 1 130px", minWidth: 120 }}>
-            <label className="input-label"><MapPin size={11} style={{ display: "inline", marginRight: 4 }} />Город</label>
-            <select className="input-field" value={city} onChange={(e) => { setCity(e.target.value); onSearch(e.target.value); }}>
-              {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+            <label className="input-label" style={{ color: "rgba(255,255,255,0.7)" }}><MapPin size={11} style={{ display: "inline", marginRight: 4 }} />Город</label>
+            <select className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} value={city} onChange={(e) => { setCity(e.target.value); onSearch(e.target.value); }}>
+              {CITIES.map((c) => <option key={c} value={c} style={{ color: "#000" }}>{c}</option>)}
             </select>
           </div>
           <div style={{ flex: "1 1 130px", minWidth: 120 }}>
-            <label className="input-label"><Calendar size={11} style={{ display: "inline", marginRight: 4 }} />Дата</label>
-            <input type="date" className="input-field" value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split("T")[0]} />
+            <label className="input-label" style={{ color: "rgba(255,255,255,0.7)" }}><Calendar size={11} style={{ display: "inline", marginRight: 4 }} />Дата</label>
+            <input type="date" className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} value={date} onChange={(e) => setDate(e.target.value)} min={new Date().toISOString().split("T")[0]} />
           </div>
           <div style={{ flex: "1 1 100px", minWidth: 90 }}>
-            <label className="input-label"><Users size={11} style={{ display: "inline", marginRight: 4 }} />Гости</label>
-            <select className="input-field" value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
-              {GUEST_OPTIONS.map((g) => <option key={g} value={g}>{g} {g === 1 ? "гость" : g < 5 ? "гостя" : "гостей"}</option>)}
+            <label className="input-label" style={{ color: "rgba(255,255,255,0.7)" }}><Users size={11} style={{ display: "inline", marginRight: 4 }} />Гости</label>
+            <select className="input-field" style={{ background: "rgba(255,255,255,0.1)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)" }} value={guests} onChange={(e) => setGuests(Number(e.target.value))}>
+              {GUEST_OPTIONS.map((g) => <option key={g} value={g} style={{ color: "#000" }}>{g} {g === 1 ? "гость" : g < 5 ? "гостя" : "гостей"}</option>)}
             </select>
           </div>
           <div style={{ flex: "0 0 auto", display: "flex", alignItems: "flex-end" }}>
@@ -140,7 +156,7 @@ function HeroSection({ onSearch }: { onSearch: (city: string) => void }) {
             { icon: Shield, text: "Гарантия брони" },
             { icon: Utensils, text: "500+ ресторанов" },
           ].map(({ icon: Icon, text }) => (
-            <span key={text} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--color-text-muted)" }}>
+            <span key={text} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "rgba(255,255,255,0.6)" }}>
               <Icon size={14} style={{ color: "var(--color-primary)" }} /> {text}
             </span>
           ))}
@@ -268,10 +284,16 @@ function RestaurantCard({ restaurant }: { restaurant: typeof MOCK_RESTAURANTS[nu
       <div className="card" style={{ cursor: "pointer" }}>
         <div style={{
           height: "clamp(140px, 20vw, 200px)",
-          background: "linear-gradient(135deg, var(--color-bg-elevated), var(--color-bg-hover))",
-          display: "flex", alignItems: "center", justifyContent: "center", position: "relative",
+          position: "relative", overflow: "hidden",
         }}>
-          <Wine size={48} style={{ color: "var(--color-text-muted)", opacity: 0.2 }} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={restaurant.coverImage} alt={restaurant.name} loading="lazy" style={{
+            width: "100%", height: "100%", objectFit: "cover",
+            transition: "transform 0.3s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          />
           {restaurant.depositRequired && (
             <span className="badge badge-gold" style={{ position: "absolute", top: 12, right: 12 }}>Депозит</span>
           )}
